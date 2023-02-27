@@ -5,7 +5,7 @@ require "csv"
 # name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_shadow,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
 # Oswaldo Bonham,Platform Health,yes,yes,no,yes,yes,yes,yes,
 #
-class CSVReader
+class CombineCSVs
   def combined_data
     people_data = people
     responses_data = responses
@@ -147,7 +147,7 @@ private
   end
 end
 
-generated_data = CSVReader.new.combined_data
+generated_data = CombineCSVs.new.combined_data
 
 # https://stackoverflow.com/a/17864876
 column_names = generated_data.first.keys
