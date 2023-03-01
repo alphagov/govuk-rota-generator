@@ -54,4 +54,25 @@ RSpec.describe GenerateRota do
     expect(developer_b.assigned_shifts.count).to eq(3)
     expect(developer_c.assigned_shifts.count).to eq(3)
   end
+
+  it "doesn't assign the same person to simultaneous shifts nor to shifts they can't do" do
+    developer_a = Person.new(name: "Developer A", team: "Foo", can_do_roles: [:some_role, :some_other_role], forbidden_weeks: [])
+    developer_b = Person.new(name: "Developer B", team: "Bar", can_do_roles: [:some_role], forbidden_weeks: [])
+    people = [developer_a, developer_b]
+    slots_to_fill = [
+      { week: 1, role: :some_role },
+      { week: 1, role: :some_other_role },
+      { week: 2, role: :some_role },
+      { week: 2, role: :some_other_role },
+      { week: 3, role: :some_role },
+      { week: 3, role: :some_other_role },
+    ]
+
+    GenerateRota.new.fill_slots(people, slots_to_fill)
+
+    expect(developer_a.assigned_shifts.count).to eq(3)
+    expect(developer_a.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_other_role])
+    expect(developer_b.assigned_shifts.count).to eq(3)
+    expect(developer_b.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_role])
+  end
 end

@@ -5,24 +5,33 @@ class CannotFillSlotException < StandardError; end
 
 class GenerateRota
   def fill_slots(people, slots_to_fill)
-    weeks = slots_to_fill.map { |slot| slot[:week] }.uniq
-    people_availability = []
-    people_availability_with_names = []
+    weeks = slots_to_fill.map { |slot| slot[:week] }.uniq.sort
     weeks.each do |week|
-      people.each do |person|
-        person.availability(week: week).each do |available_role|
-          people_availability << { week: week, role: available_role }
-          people_availability_with_names << { week: week, role: available_role, person: person }
+      roles_to_fill = slots_to_fill.select { |slot| slot[:week] == week }.map { |slot| slot[:role] }
+
+      # EXAMPLE output:
+      # { inhours_primary: [PersonA, PersonB], oncall_primary: [PersonA] }
+      week_roles_availability = Hash[
+        roles_to_fill.map {|role| [role, people.select { |person| person.availability(week: week).include?(role) }]}
+      ]
+
+      # Sort the role allocation by sparsity of dev availability,
+      # i.e. if a particular role can only be filled by one dev, assign that dev to that role first
+      week_roles_availability = week_roles_availability.sort { |role, available_devs| available_devs.count }
+
+      devs_used = []
+      week_roles_availability.each do |role, available_devs|
+        if available_devs.count.zero?
+          raise CannotFillSlotException.new("Nobody is available for the #{role} in week #{week}")
+        elsif ((remaining_devs = available_devs - devs_used) && remaining_devs.count.zero?)
+          raise CannotFillSlotException.new("Can't fill #{role} in week #{week} because all eligible devs are already assigned to other roles.")
         end
+
+        # prefer assigning shift to devs who have been given fewer shifts so far
+        chosen_dev = remaining_devs.sort_by { |person| person.assigned_shifts.count }.first
+        chosen_dev.assign(role: role, week: week)
+        devs_used << chosen_dev
       end
-    end
-
-    slots_to_fill.each do |slot|
-      raise CannotFillSlotException.new("Nobody is available for the #{slot[:role]} in week #{slot[:week]}") unless people_availability.include?(slot)
-
-      eligible_people = people_availability_with_names.select { |hsh| hsh[:week] == slot[:week] && hsh[:role] == slot[:role] }.map { |hsh| hsh[:person] }
-      eligible_people = eligible_people.sort_by { |person| person.assigned_shifts.count }
-      eligible_people.first.assign(role: slot[:role], week: slot[:week])
     end
 
     slots_filled(people)
