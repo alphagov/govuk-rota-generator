@@ -38,4 +38,22 @@ class Person
 
     @assigned_shifts.delete(shift_to_unassign)
   end
+
+  def weight_of_shifts
+    value_mappings = {
+      inhours_primary: 1.5,
+      inhours_secondary: 1,
+      inhours_primary_standby: 0.5,
+      inhours_secondary_standby: 0.5,
+      inhours_shadow: 0,
+      oncall_primary: 2.5,
+      oncall_secondary: 2,
+    }
+    @assigned_shifts.reduce(0) do |sum, shift|
+      value_of_shift = value_mappings[shift[:role].to_sym]
+      # hack for tests that make reference to `:some_role`
+      value_of_shift = value_of_shift.nil? ? 0 : value_of_shift
+      sum + value_of_shift
+    end
+  end
 end

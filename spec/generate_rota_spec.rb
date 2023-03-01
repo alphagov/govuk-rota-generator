@@ -2,6 +2,8 @@ require "generate_rota"
 require "person"
 
 RSpec.describe GenerateRota do
+  let(:fixture_path) { File.dirname(__FILE__) + "/fixtures/" }
+
   it "raises an exception if a slot can't be filled" do
     people = [
       Person.new(name: "Dev Eloper", team: "Foo", can_do_roles: [:some_role], forbidden_weeks: [1]),
@@ -74,5 +76,72 @@ RSpec.describe GenerateRota do
     expect(developer_a.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_other_role])
     expect(developer_b.assigned_shifts.count).to eq(3)
     expect(developer_b.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_role])
+  end
+
+  it "generates a proportionally split rota according to the value of each role" do
+    rota_generator = GenerateRota.new(csv: "#{fixture_path}/simple.csv")
+    rota_generator.generate(
+      weeks_to_generate: 2,
+      roles_to_fill: {
+        inhours_primary: {
+        },
+        inhours_secondary: {
+        },
+        inhours_primary_standby: {
+        },
+        inhours_secondary_standby: {
+        },
+        inhours_shadow: {
+          # TODO: mark as optional
+        },
+        oncall_primary: {
+        },
+        oncall_secondary: {
+        },
+      }
+    )
+
+    expect(rota_generator.to_h).to eq([
+      {:assignee=>"Developer A", :role=>:oncall_secondary, :week=>1},
+      {:assignee=>"Developer B", :role=>:oncall_primary, :week=>1},
+      {:assignee=>"Developer D", :role=>:inhours_secondary_standby, :week=>1},
+      {:assignee=>"Developer E", :role=>:inhours_shadow, :week=>1},
+      {:assignee=>"Developer F", :role=>:inhours_primary_standby, :week=>1},
+      {:assignee=>"Developer G", :role=>:inhours_secondary, :week=>1},
+      {:assignee=>"Developer H", :role=>:inhours_primary, :week=>1},
+      {:assignee=>"Developer I", :role=>:inhours_secondary_standby, :week=>2},
+      {:assignee=>"Developer A", :role=>:oncall_primary, :week=>2},
+      {:assignee=>"Developer E", :role=>:inhours_shadow, :week=>2},
+      {:assignee=>"Developer B", :role=>:inhours_secondary, :week=>2},
+      {:assignee=>"Developer C", :role=>:oncall_secondary, :week=>2},
+      {:assignee=>"Developer J", :role=>:inhours_primary_standby, :week=>2},
+      {:assignee=>"Developer D", :role=>:inhours_primary, :week=>2},
+    ])
+  end
+
+  it "can handle real datasets" do
+    rota_generator = GenerateRota.new(csv: "#{fixture_path}/output.csv")
+    rota_generator.generate(
+      weeks_to_generate: 13,
+      roles_to_fill: {
+        inhours_primary: {
+        },
+        inhours_secondary: {
+        },
+        inhours_primary_standby: {
+        },
+        inhours_secondary_standby: {
+        },
+        inhours_shadow: {
+          # TODO: mark as optional
+        },
+        oncall_primary: {
+        },
+        oncall_secondary: {
+        },
+      }
+    )
+
+    expect(rota_generator.to_csv).to eq("TBC")
   end
 end
