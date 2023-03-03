@@ -1,0 +1,11 @@
+name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_shadow,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
+Developer A,Platform Health,true,true,false,true,true,true,true,
+Developer B,Platform Health,true,true,false,true,true,true,true,
+Developer C,Platform Health,true,true,false,true,true,false,true,"1,3,5"
+Developer D,Platform Health,true,true,false,true,true,true,true,
+Developer E,Platform Health,true,true,true,true,true,false,true,
+Developer F,Platform Health,true,true,false,true,true,false,false,
+Developer G,Platform Health,true,true,false,true,true,false,false,
+Developer H,Platform Health,true,true,false,true,true,false,false,
+Developer I,Platform Health,true,true,false,true,true,false,false,
+Developer J,Platform Health,true,true,false,true,true,false,false,
