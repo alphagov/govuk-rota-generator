@@ -2,6 +2,7 @@ require "generate_rota"
 require "person"
 
 RSpec.describe GenerateRota do
+  let(:fixture_path) { File.dirname(__FILE__) + "/fixtures/" }
   let(:roles_config) do
     {
       some_role: {},
@@ -61,5 +62,40 @@ RSpec.describe GenerateRota do
     expect(developer_a.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_other_role])
     expect(developer_b.assigned_shifts.count).to eq(3)
     expect(developer_b.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_role])
+  end
+
+  it "can handle real datasets" do
+    rota_generator = GenerateRota.new(csv: "#{fixture_path}/availability.csv")
+    roles_config = {
+      inhours_primary: {
+        value: 1.4,
+      },
+      inhours_secondary: {
+        value: 1.1,
+      },
+      inhours_primary_standby: {
+        value: 0.75,
+      },
+      inhours_secondary_standby: {
+        value: 0.75,
+      },
+      inhours_shadow: {
+        value: 0,
+        optional: true,
+      },
+      oncall_primary: {
+        value: 2.5,
+      },
+      oncall_secondary: {
+        value: 2,
+      },
+    }
+    rota_generator.fill_slots(
+      rota_generator.people,
+      rota_generator.slots_to_fill(13, roles_config),
+      roles_config,
+    )
+
+    expect(rota_generator.to_csv).to eq(File.read("#{fixture_path}/expected_output.csv"))
   end
 end
