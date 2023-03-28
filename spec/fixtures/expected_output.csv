@@ -1,0 +1,14 @@
+week,inhours_secondary,inhours_secondary_standby,inhours_primary_standby,oncall_primary,inhours_shadow,oncall_secondary,inhours_primary
+1,Chris Ashton,Sam Simpson,Bruce Bolt,Callum Knights,James Chan,Aga Dufrat,Chris Banks
+2,David Gisbey,James Robinson,Kelvin Gan,Rosa Fox,James Chan,Leena Gupte,Bruce Bolt
+3,Jessica Jones,Jonathan Kirwan,Catalina Ilie,Murilo Dal Ri,James Chan,Keith Lawrence,Rebecca Pearce
+4,Patrick Cartlidge,Martin Jones,Kelvin Gan,Simon Hughesdon,James Chan,Peter Hartshorn,Sam Simpson
+5,Catalina Ilie,Graham Lewis,Ollie Treend,Keith Lawrence,James Chan,Chris Banks,Bruce Bolt
+6,Jonathan Kirwan,Ollie Treend,Graham Lewis,Peter Hartshorn,James Chan,Sean Rankine,Kelvin Gan
+7,Martin Jones,James Robinson,Jessica Jones,Leena Gupte,,Aga Dufrat,Rebecca Pearce
+8,Patrick Cartlidge,David Gisbey,Ollie Treend,Callum Knights,,Sean Rankine,Catalina Ilie
+9,James Robinson,Graham Lewis,Ollie Treend,Chris Banks,James Chan,Sam Simpson,Rebecca Pearce
+10,Martin Jones,Jonathan Kirwan,Graham Lewis,Murilo Dal Ri,James Chan,Barbara Slawinska,Ollie Treend
+11,Patrick Cartlidge,David Gisbey,Jessica Jones,Barbara Slawinska,James Chan,Chris Ashton,Kelvin Gan
+12,David Gisbey,Jonathan Kirwan,Jessica Jones,Chris Ashton,James Chan,Simon Hughesdon,Catalina Ilie
+13,Martin Jones,James Robinson,Jessica Jones,Sam Simpson,James Chan,Rosa Fox,Rebecca Pearce
