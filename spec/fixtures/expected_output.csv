@@ -1,14 +1,14 @@
 week,inhours_secondary,inhours_secondary_standby,inhours_primary_standby,oncall_primary,inhours_shadow,oncall_secondary,inhours_primary
-1,Chris Ashton,Sam Simpson,Bruce Bolt,Callum Knights,James Chan,Aga Dufrat,Chris Banks
-2,David Gisbey,James Robinson,Kelvin Gan,Rosa Fox,James Chan,Leena Gupte,Bruce Bolt
-3,Jessica Jones,Jonathan Kirwan,Catalina Ilie,Murilo Dal Ri,James Chan,Keith Lawrence,Rebecca Pearce
-4,Patrick Cartlidge,Martin Jones,Kelvin Gan,Simon Hughesdon,James Chan,Peter Hartshorn,Sam Simpson
-5,Catalina Ilie,Graham Lewis,Ollie Treend,Keith Lawrence,James Chan,Chris Banks,Bruce Bolt
-6,Jonathan Kirwan,Ollie Treend,Graham Lewis,Peter Hartshorn,James Chan,Sean Rankine,Kelvin Gan
-7,Martin Jones,James Robinson,Jessica Jones,Leena Gupte,,Aga Dufrat,Rebecca Pearce
-8,Patrick Cartlidge,David Gisbey,Ollie Treend,Callum Knights,,Sean Rankine,Catalina Ilie
-9,James Robinson,Graham Lewis,Ollie Treend,Chris Banks,James Chan,Sam Simpson,Rebecca Pearce
-10,Martin Jones,Jonathan Kirwan,Graham Lewis,Murilo Dal Ri,James Chan,Barbara Slawinska,Ollie Treend
-11,Patrick Cartlidge,David Gisbey,Jessica Jones,Barbara Slawinska,James Chan,Chris Ashton,Kelvin Gan
-12,David Gisbey,Jonathan Kirwan,Jessica Jones,Chris Ashton,James Chan,Simon Hughesdon,Catalina Ilie
-13,Martin Jones,James Robinson,Jessica Jones,Sam Simpson,James Chan,Rosa Fox,Rebecca Pearce
+1,Fatima Al-Zahra,Xoliswa Dlamini,Chen Li,Devika Patel,Juliette Moreau,Aiden Smith,Grigori Ivanov
+2,Hana Kim,Kofi Mensah,Oskar Svensson,Wojciech Kowalski,Juliette Moreau,Pilar Sánchez,Chen Li
+3,Laila Naser,Mateo Garcia,Emilio Rossi,Rania Zadeh,Juliette Moreau,Ngozi Okonkwo,Valentina Silva
+4,Tessa Van der Meer,Quyền Nguyễn,Oskar Svensson,Zara Öztürk,Juliette Moreau,Uday Khanna,Xoliswa Dlamini
+5,Emilio Rossi,Ichiro Tanaka,Stefan Popescu,Ngozi Okonkwo,Juliette Moreau,Grigori Ivanov,Chen Li
+6,Mateo Garcia,Stefan Popescu,Ichiro Tanaka,Uday Khanna,Juliette Moreau,Yosef Cohen,Oskar Svensson
+7,Quyền Nguyễn,Kofi Mensah,Laila Naser,Pilar Sánchez,,Aiden Smith,Valentina Silva
+8,Tessa Van der Meer,Hana Kim,Stefan Popescu,Devika Patel,,Yosef Cohen,Emilio Rossi
+9,Kofi Mensah,Ichiro Tanaka,Stefan Popescu,Grigori Ivanov,Juliette Moreau,Xoliswa Dlamini,Valentina Silva
+10,Quyền Nguyễn,Mateo Garcia,Ichiro Tanaka,Rania Zadeh,Juliette Moreau,Beatriz Gomez,Stefan Popescu
+11,Tessa Van der Meer,Hana Kim,Laila Naser,Beatriz Gomez,Juliette Moreau,Fatima Al-Zahra,Oskar Svensson
+12,Hana Kim,Mateo Garcia,Laila Naser,Fatima Al-Zahra,Juliette Moreau,Zara Öztürk,Emilio Rossi
+13,Quyền Nguyễn,Kofi Mensah,Laila Naser,Xoliswa Dlamini,Juliette Moreau,Wojciech Kowalski,Valentina Silva
