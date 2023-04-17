@@ -23,13 +23,13 @@ class Person
   end
 
   def assign(role:, week:)
-    raise ForbiddenRoleException.new unless can_do_role?(role)
-    raise ForbiddenWeekException.new if availability(week: week).empty?
+    raise ForbiddenRoleException unless can_do_role?(role)
+    raise ForbiddenWeekException if availability(week:).empty?
     if (conflicting_shift = @assigned_shifts.find { |shift| shift[:week] == week })
-      raise MultipleRolesException.new("Failed to assign role #{role} to #{name} in week #{week} as they're already assigned to #{conflicting_shift[:role]}")
+      raise MultipleRolesException, "Failed to assign role #{role} to #{name} in week #{week} as they're already assigned to #{conflicting_shift[:role]}"
     end
 
-    @assigned_shifts << { week: week, role: role }
+    @assigned_shifts << { week:, role: }
   end
 
   def unassign(role:, week:)
