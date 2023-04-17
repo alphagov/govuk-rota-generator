@@ -85,7 +85,6 @@ class GenerateRota
     columns = %w[week] + roles
     csv_lines = [columns]
     weeks.times.each do |week_index|
-      roles_that_week = slots.select { |slot| slot[:week] == week_index + 1 }
       row = columns.map do |column|
         week = week_index + 1
         if column == "week"
