@@ -52,7 +52,8 @@ class GenerateRota
         end
 
         # prefer assigning shift to devs who have been given fewer shifts so far, or less burdensome shifts
-        chosen_dev = remaining_devs.min_by { |person| fairness_calculator.weight_of_shifts(person.assigned_shifts) }
+        assignable_devs = remaining_devs.sort_by { |person| fairness_calculator.weight_of_shifts(person.assigned_shifts) }
+        chosen_dev = assignable_devs.first
         chosen_dev.assign(role:, week:)
         devs_used << chosen_dev
       end
