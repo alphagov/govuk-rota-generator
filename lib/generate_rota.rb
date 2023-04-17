@@ -16,8 +16,8 @@ class GenerateRota
   def slots_to_fill(weeks_to_generate, roles_to_fill)
     slots_to_fill = []
     weeks_to_generate.times.each do |index|
-      roles_to_fill.keys.each do |role|
-        slots_to_fill << { week: (index + 1), role: role }
+      roles_to_fill.each_key do |role|
+        slots_to_fill << { week: (index + 1), role: }
       end
     end
     slots_to_fill
@@ -32,26 +32,28 @@ class GenerateRota
       # EXAMPLE output:
       # { inhours_primary: [PersonA, PersonB], oncall_primary: [PersonA] }
       week_roles_availability = Hash[
-        roles_to_fill.map {|role| [role, people.select { |person| person.availability(week: week).include?(role) }]}
+        roles_to_fill.map { |role| [role, people.select { |person| person.availability(week:).include?(role) }] }
       ]
 
       # Sort the role allocation by sparsity of dev availability,
       # i.e. if a particular role can only be filled by one dev, assign that dev to that role first
-      week_roles_availability = week_roles_availability.sort { |role, available_devs| available_devs.count }
+      week_roles_availability = week_roles_availability.sort { |_role, available_devs| available_devs.count }
 
       devs_used = []
       week_roles_availability.each do |role, available_devs|
         if available_devs.count.zero?
-          next unless role_mandatory?(roles_config, role) # silently ignore issue unless role is mandatory
-          raise CannotFillSlotException.new("Nobody is available for the #{role} in week #{week}")
-        elsif ((remaining_devs = available_devs - devs_used) && remaining_devs.count.zero?)
-          next unless role_mandatory?(roles_config, role) # silently ignore issue unless role is mandatory
-          raise CannotFillSlotException.new("Can't fill #{role} in week #{week} because all eligible devs are already assigned to other roles.")
+          next unless role_mandatory?(roles_config, role) #  silently ignore issue unless role is mandatory
+
+          raise CannotFillSlotException, "Nobody is available for the #{role} in week #{week}"
+        elsif (remaining_devs = available_devs - devs_used) && remaining_devs.count.zero?
+          next unless role_mandatory?(roles_config, role) #  silently ignore issue unless role is mandatory
+
+          raise CannotFillSlotException, "Can't fill #{role} in week #{week} because all eligible devs are already assigned to other roles."
         end
 
         # prefer assigning shift to devs who have been given fewer shifts so far, or less burdensome shifts
-        chosen_dev = remaining_devs.sort_by { |person| fairness_calculator.weight_of_shifts(person.assigned_shifts) }.first
-        chosen_dev.assign(role: role, week: week)
+        chosen_dev = remaining_devs.min_by { |person| fairness_calculator.weight_of_shifts(person.assigned_shifts) }
+        chosen_dev.assign(role:, week:)
         devs_used << chosen_dev
       end
     end
@@ -61,7 +63,7 @@ class GenerateRota
 
   def role_mandatory?(roles_config, role)
     return false if roles_config.dig(role, :optional) == true
-    
+
     true
   end
 
@@ -78,9 +80,9 @@ class GenerateRota
 
   def to_csv
     slots = slots_filled(@people)
-    weeks = slots.map { |slot| slot[:week] }.uniq.sort.last
+    weeks = slots.map { |slot| slot[:week] }.uniq.max
     roles = slots.map { |slot| slot[:role] }.uniq
-    columns = ["week"] + roles
+    columns = %w[week] + roles
     csv_lines = [columns]
     weeks.times.each do |week_index|
       roles_that_week = slots.select { |slot| slot[:week] == week_index + 1 }
@@ -98,7 +100,7 @@ class GenerateRota
     csv_lines.map { |row| row.join(",") }.join("\n")
   end
 
-  private
+private
 
   def parse_csv_data(csv_data)
     csv_data.each.with_index(1).map do |row|
@@ -116,8 +118,8 @@ class GenerateRota
       Person.new(
         name: person_hash[:name],
         team: person_hash[:team],
-        forbidden_weeks: forbidden_weeks,
-        can_do_roles: can_do_roles,
+        forbidden_weeks:,
+        can_do_roles:,
       )
     end
   end

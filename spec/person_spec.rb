@@ -2,33 +2,33 @@ require "person"
 
 RSpec.describe Person do
   let(:person) do
-    Person.new(
+    described_class.new(
       name: "Dev Eloper",
       team: "Platform Reliability",
-      can_do_roles: [
-        :inhours_primary,
-        :inhours_secondary,
-        :inhours_primary_standby,
-        :inhours_secondary_standby,
-        :oncall_primary,
-        :oncall_secondary,
+      can_do_roles: %i[
+        inhours_primary
+        inhours_secondary
+        inhours_primary_standby
+        inhours_secondary_standby
+        oncall_primary
+        oncall_secondary
       ],
       forbidden_weeks: [3, 7],
     )
   end
-  
+
   describe "#name" do
     it "returns the person's name" do
       expect(person.name).to eq("Dev Eloper")
     end
   end
-  
+
   describe "#team" do
     it "returns the person's team" do
       expect(person.team).to eq("Platform Reliability")
     end
   end
-  
+
   describe "#can_do_role?" do
     it "returns `true` for roles that the person can do" do
       expect(person.can_do_role?(:inhours_primary)).to eq(true)
@@ -42,13 +42,13 @@ RSpec.describe Person do
 
   describe "#availability" do
     it "returns a list of roles the person can do in the given week" do
-      expect(person.availability(week: 1)).to eq([
-        :inhours_primary,
-        :inhours_secondary,
-        :inhours_primary_standby,
-        :inhours_secondary_standby,
-        :oncall_primary,
-        :oncall_secondary,
+      expect(person.availability(week: 1)).to eq(%i[
+        inhours_primary
+        inhours_secondary
+        inhours_primary_standby
+        inhours_secondary_standby
+        oncall_primary
+        oncall_secondary
       ])
     end
 
@@ -59,7 +59,7 @@ RSpec.describe Person do
 
   describe "#assign" do
     it "allows assigning a supported role in an available week" do
-      expect { person.assign(role: :inhours_primary, week: 1) }.to_not raise_exception
+      expect { person.assign(role: :inhours_primary, week: 1) }.not_to raise_exception
     end
 
     it "raises an error when assigning a supported role in a forbidden week" do
@@ -71,7 +71,7 @@ RSpec.describe Person do
     end
 
     it "raises an error when assigning multiple supported roles in an available week" do
-      expect { person.assign(role: :inhours_primary, week: 1) }.to_not raise_exception
+      expect { person.assign(role: :inhours_primary, week: 1) }.not_to raise_exception
       expect { person.assign(role: :inhours_secondary, week: 1) }.to raise_exception(MultipleRolesException)
     end
   end
@@ -79,12 +79,12 @@ RSpec.describe Person do
   describe "#unassign" do
     it "allows unassigning an existing assigned shift" do
       person.assign(role: :inhours_primary, week: 1)
-      expect { person.unassign(role: :inhours_primary, week: 1) }.to_not raise_exception
+      expect { person.unassign(role: :inhours_primary, week: 1) }.not_to raise_exception
     end
 
     it "raises an error when unassigning a shift that has already been unassigned" do
       person.assign(role: :inhours_primary, week: 1)
-      expect { person.unassign(role: :inhours_primary, week: 1) }.to_not raise_exception
+      expect { person.unassign(role: :inhours_primary, week: 1) }.not_to raise_exception
       expect { person.unassign(role: :inhours_primary, week: 1) }.to raise_exception(ShiftNotAssignedException)
     end
   end
@@ -105,7 +105,7 @@ RSpec.describe Person do
         {
           week: 2,
           role: :inhours_secondary,
-        }
+        },
       ])
     end
 
@@ -122,7 +122,7 @@ RSpec.describe Person do
         {
           week: 4,
           role: :oncall_primary,
-        }
+        },
       ])
     end
   end
