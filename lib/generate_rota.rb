@@ -75,8 +75,11 @@ class GenerateRota
 
   def slots_filled(people)
     shifts = people.reduce([]) do |arr, person|
+      puts "Zitti e buoni #{person.assigned_shifts}"
       arr + person.assigned_shifts.map { |shift| shift.merge(assignee: person.name) }
     end
+    puts "LOVE IS BLIND #{shifts}"
+    puts "MEOW MEOW I AM A CAT #{shifts.sort_by { |shift| shift[:week] }}"
     shifts.sort_by { |shift| shift[:week] }
   end
 
