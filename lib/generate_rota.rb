@@ -8,6 +8,7 @@ class GenerateRota
   attr_reader :people
 
   def initialize(csv: nil)
+    @real_test = !csv.nil?
     unless csv.nil?
       @people = parse_csv_data(CSV.read(csv, headers: true))
     end
@@ -38,6 +39,10 @@ class GenerateRota
       # Sort the role allocation by sparsity of dev availability,
       # i.e. if a particular role can only be filled by one dev, assign that dev to that role first
       week_roles_availability = week_roles_availability.sort { |_role, available_devs| available_devs.count }
+
+      if @real_test
+        puts week_roles_availability.map(&:first).join(",")
+      end
 
       devs_used = []
       week_roles_availability.each do |role, available_devs|
