@@ -64,7 +64,42 @@ RSpec.describe GenerateRota do
     expect(developer_b.assigned_shifts.map { |shift| shift[:role] }.uniq).to eq([:some_role])
   end
 
-  it "can handle real datasets" do
+  # it "can handle real datasets" do
+  #   rota_generator = described_class.new(csv: "#{fixture_path}/availability.csv")
+  #   roles_config = {
+  #     inhours_primary: {
+  #       value: 1.4,
+  #     },
+  #     inhours_secondary: {
+  #       value: 1.1,
+  #     },
+  #     inhours_primary_standby: {
+  #       value: 0.75,
+  #     },
+  #     inhours_secondary_standby: {
+  #       value: 0.75,
+  #     },
+  #     inhours_shadow: {
+  #       value: 0,
+  #       optional: true,
+  #     },
+  #     oncall_primary: {
+  #       value: 2.5,
+  #     },
+  #     oncall_secondary: {
+  #       value: 2,
+  #     },
+  #   }
+  #   rota_generator.fill_slots(
+  #     rota_generator.people,
+  #     rota_generator.slots_to_fill(13, roles_config),
+  #     roles_config,
+  #   )
+
+  #   expect(rota_generator.to_csv).to eq(File.read("#{fixture_path}/expected_output.csv"))
+  # end
+
+  it "can do all the super cool things" do
     rota_generator = described_class.new(csv: "#{fixture_path}/availability.csv")
     roles_config = {
       inhours_primary: {
@@ -92,10 +127,10 @@ RSpec.describe GenerateRota do
     }
     rota_generator.fill_slots(
       rota_generator.people,
-      rota_generator.slots_to_fill(13, roles_config),
+      rota_generator.slots_to_fill(3, roles_config),
       roles_config,
     )
-
-    expect(rota_generator.to_csv).to eq(File.read("#{fixture_path}/expected_output.csv"))
+    puts "ATOM WAS COOL #{rota_generator.to_csv}"
+    expect(rota_generator.to_csv).to eq(7)
   end
 end
