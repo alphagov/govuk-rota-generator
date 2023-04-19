@@ -88,6 +88,10 @@ class GenerateRota
     slots = slots_filled(@people)
     weeks = slots.map { |slot| slot[:week] }.uniq.max
     roles = slots.map { |slot| slot[:role] }.uniq
+    if @real_test
+      puts slots
+      puts roles
+    end
     columns = %w[week] + roles
     csv_lines = [columns]
     weeks.times.each do |week_index|
