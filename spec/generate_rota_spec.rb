@@ -90,11 +90,16 @@ RSpec.describe GenerateRota do
         value: 2,
       },
     }
+
     rota_generator.fill_slots(
       rota_generator.people,
       rota_generator.slots_to_fill(13, roles_config),
       roles_config,
     )
+
+    rota_generator.people.each do |p|
+      puts("#{p.name}, #{p.team}, #{p.assigned_shifts}")
+    end
 
     expect(rota_generator.to_csv).to eq(File.read("#{fixture_path}/expected_output.csv"))
   end
