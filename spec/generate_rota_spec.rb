@@ -65,6 +65,7 @@ RSpec.describe GenerateRota do
   end
 
   it "can handle real datasets" do
+    Randomiser.instance.set_seed(5959)
     rota_generator = described_class.new(csv: "#{fixture_path}/availability.csv")
     roles_config = {
       inhours_primary: {
@@ -96,10 +97,6 @@ RSpec.describe GenerateRota do
       rota_generator.slots_to_fill(13, roles_config),
       roles_config,
     )
-
-    rota_generator.people.each do |p|
-      puts("#{p.name}, #{p.team}, #{p.assigned_shifts}")
-    end
 
     expect(rota_generator.to_csv).to eq(File.read("#{fixture_path}/expected_output.csv"))
   end
