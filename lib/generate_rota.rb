@@ -26,6 +26,7 @@ class GenerateRota
   def fill_slots(people, slots_to_fill, roles_config = {})
     weeks = slots_to_fill.map { |slot| slot[:week] }.uniq.sort
     fairness_calculator = FairnessCalculator.new(roles_config)
+
     weeks.each do |week|
       roles_to_fill = slots_to_fill.select { |slot| slot[:week] == week }.map { |slot| slot[:role] }
 
@@ -52,7 +53,7 @@ class GenerateRota
         end
 
         # prefer assigning shift to devs who have been given fewer shifts so far, or less burdensome shifts
-        assignable_devs = remaining_devs.sort_by { |person| fairness_calculator.weight_of_shifts(person.assigned_shifts) }
+        assignable_devs = remaining_devs.sort_by { |person| [fairness_calculator.weight_of_shifts(person.assigned_shifts), person.random_factor] }
         chosen_dev = assignable_devs.first
         chosen_dev.assign(role:, week:)
         devs_used << chosen_dev
@@ -82,7 +83,8 @@ class GenerateRota
   def to_csv
     slots = slots_filled(@people)
     weeks = slots.map { |slot| slot[:week] }.uniq.max
-    roles = slots.map { |slot| slot[:role] }.uniq
+    # roles = slots.map { |slot| slot[:role] }.uniq
+    roles = %i[inhours_primary inhours_secondary inhours_shadow inhours_primary_standby inhours_secondary_standby oncall_primary oncall_secondary]
     columns = %w[week] + roles
     csv_lines = [columns]
     weeks.times.each do |week_index|

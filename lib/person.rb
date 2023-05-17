@@ -1,10 +1,12 @@
+require_relative "./randomiser"
+
 class ForbiddenRoleException < StandardError; end
 class ForbiddenWeekException < StandardError; end
 class MultipleRolesException < StandardError; end
 class ShiftNotAssignedException < StandardError; end
 
 class Person
-  attr_reader :name, :team, :assigned_shifts
+  attr_reader :name, :team, :assigned_shifts, :random_factor
 
   def initialize(name:, team:, can_do_roles:, forbidden_weeks:)
     @name = name
@@ -12,6 +14,7 @@ class Person
     @can_do_roles = can_do_roles
     @forbidden_weeks = forbidden_weeks
     @assigned_shifts = []
+    @random_factor = Randomiser.instance.next_float
   end
 
   def can_do_role?(role)

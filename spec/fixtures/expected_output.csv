@@ -1,14 +1,14 @@
-week,inhours_secondary,inhours_secondary_standby,inhours_primary_standby,oncall_primary,inhours_shadow,oncall_secondary,inhours_primary
-1,Fatima Al-Zahra,Xoliswa Dlamini,Chen Li,Devika Patel,Juliette Moreau,Aiden Smith,Grigori Ivanov
-2,Hana Kim,Kofi Mensah,Oskar Svensson,Wojciech Kowalski,Juliette Moreau,Pilar Sánchez,Chen Li
-3,Laila Naser,Mateo Garcia,Emilio Rossi,Rania Zadeh,Juliette Moreau,Ngozi Okonkwo,Valentina Silva
-4,Tessa Van der Meer,Quyền Nguyễn,Oskar Svensson,Zara Öztürk,Juliette Moreau,Uday Khanna,Xoliswa Dlamini
-5,Emilio Rossi,Ichiro Tanaka,Stefan Popescu,Ngozi Okonkwo,Juliette Moreau,Grigori Ivanov,Chen Li
-6,Mateo Garcia,Stefan Popescu,Ichiro Tanaka,Uday Khanna,Juliette Moreau,Yosef Cohen,Oskar Svensson
-7,Quyền Nguyễn,Kofi Mensah,Laila Naser,Pilar Sánchez,,Aiden Smith,Valentina Silva
-8,Tessa Van der Meer,Hana Kim,Stefan Popescu,Devika Patel,,Yosef Cohen,Emilio Rossi
-9,Kofi Mensah,Ichiro Tanaka,Stefan Popescu,Grigori Ivanov,Juliette Moreau,Xoliswa Dlamini,Valentina Silva
-10,Quyền Nguyễn,Mateo Garcia,Ichiro Tanaka,Rania Zadeh,Juliette Moreau,Beatriz Gomez,Stefan Popescu
-11,Tessa Van der Meer,Hana Kim,Laila Naser,Beatriz Gomez,Juliette Moreau,Fatima Al-Zahra,Oskar Svensson
-12,Hana Kim,Mateo Garcia,Laila Naser,Fatima Al-Zahra,Juliette Moreau,Zara Öztürk,Emilio Rossi
-13,Quyền Nguyễn,Kofi Mensah,Laila Naser,Xoliswa Dlamini,Juliette Moreau,Wojciech Kowalski,Valentina Silva
+week,inhours_primary,inhours_secondary,inhours_shadow,inhours_primary_standby,inhours_secondary_standby,oncall_primary,oncall_secondary
+1,Grigori Ivanov,Kofi Mensah,Juliette Moreau,Fatima Al-Zahra,Xoliswa Dlamini,Pilar Sánchez,Ngozi Okonkwo
+2,Xoliswa Dlamini,Hana Kim,Juliette Moreau,Chen Li,Oskar Svensson,Devika Patel,Wojciech Kowalski
+3,Rania Zadeh,Quyền Nguyễn,Juliette Moreau,Valentina Silva,Emilio Rossi,Aiden Smith,Zara Öztürk
+4,Oskar Svensson,Mateo Garcia,Juliette Moreau,Laila Naser,Tessa Van der Meer,Ngozi Okonkwo,Uday Khanna
+5,Chen Li,Emilio Rossi,Juliette Moreau,Ichiro Tanaka,Stefan Popescu,Wojciech Kowalski,Grigori Ivanov
+6,Emilio Rossi,Tessa Van der Meer,Juliette Moreau,Ichiro Tanaka,Stefan Popescu,Rania Zadeh,Yosef Cohen
+7,Stefan Popescu,Quyền Nguyễn,,Laila Naser,Valentina Silva,Zara Öztürk,Uday Khanna
+8,Laila Naser,Hana Kim,,Valentina Silva,Kofi Mensah,Pilar Sánchez,Yosef Cohen
+9,Valentina Silva,Kofi Mensah,Juliette Moreau,Chen Li,Ichiro Tanaka,Devika Patel,Xoliswa Dlamini
+10,Stefan Popescu,Tessa Van der Meer,Juliette Moreau,Ichiro Tanaka,Mateo Garcia,Grigori Ivanov,Beatriz Gomez
+11,Chen Li,Quyền Nguyễn,Juliette Moreau,Oskar Svensson,Mateo Garcia,Beatriz Gomez,Fatima Al-Zahra
+12,Laila Naser,Mateo Garcia,Juliette Moreau,Oskar Svensson,Hana Kim,Xoliswa Dlamini,Fatima Al-Zahra
+13,Oskar Svensson,Hana Kim,Juliette Moreau,Emilio Rossi,Kofi Mensah,Beatriz Gomez,Ngozi Okonkwo

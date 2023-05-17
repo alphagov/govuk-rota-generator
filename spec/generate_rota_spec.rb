@@ -65,6 +65,7 @@ RSpec.describe GenerateRota do
   end
 
   it "can handle real datasets" do
+    Randomiser.instance.set_seed(5959)
     rota_generator = described_class.new(csv: "#{fixture_path}/availability.csv")
     roles_config = {
       inhours_primary: {
@@ -90,6 +91,7 @@ RSpec.describe GenerateRota do
         value: 2,
       },
     }
+
     rota_generator.fill_slots(
       rota_generator.people,
       rota_generator.slots_to_fill(13, roles_config),
