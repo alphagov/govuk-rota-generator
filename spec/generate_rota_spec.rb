@@ -15,7 +15,8 @@ RSpec.describe GenerateRota do
     ]
     slots_to_fill = described_class.new.slots_to_fill(1, roles_config)
 
-    expect { described_class.new.fill_slots(people, slots_to_fill) }.to raise_exception(CannotFillSlotException)
+    expect { described_class.new.fill_slots(people, slots_to_fill) }
+      .to output("WARNING: nobody is available for some_role in week 1\n").to_stdout
   end
 
   it "avoids allocating forbidden_weeks" do

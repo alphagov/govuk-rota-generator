@@ -2,8 +2,6 @@ require "csv"
 require_relative "./person"
 require_relative "./fairness_calculator"
 
-class CannotFillSlotException < StandardError; end
-
 class GenerateRota
   attr_reader :people
 
@@ -42,21 +40,18 @@ class GenerateRota
 
       devs_used = []
       week_roles_availability.each do |role, available_devs|
-        if available_devs.count.zero?
-          next unless role_mandatory?(roles_config, role) #  silently ignore issue unless role is mandatory
-
-          raise CannotFillSlotException, "Nobody is available for the #{role} in week #{week}"
+        # We could raise an exception, but it's usually more helpful to generate a rough rota.
+        if available_devs.count.zero? && role_mandatory?(roles_config, role)
+          puts "WARNING: nobody is available for #{role} in week #{week}"
         elsif (remaining_devs = available_devs - devs_used) && remaining_devs.count.zero?
-          next unless role_mandatory?(roles_config, role) #  silently ignore issue unless role is mandatory
-
-          raise CannotFillSlotException, "Can't fill #{role} in week #{week} because all eligible devs are already assigned to other roles."
+          puts "WARNING: can't fill #{role} in week #{week} because all eligible devs are already assigned to other roles."
+        else
+          # prefer assigning shift to devs who have been given fewer shifts so far, or less burdensome shifts
+          assignable_devs = remaining_devs.sort_by { |person| [fairness_calculator.weight_of_shifts(person.assigned_shifts), person.random_factor] }
+          chosen_dev = assignable_devs.first
+          chosen_dev.assign(role:, week:)
+          devs_used << chosen_dev
         end
-
-        # prefer assigning shift to devs who have been given fewer shifts so far, or less burdensome shifts
-        assignable_devs = remaining_devs.sort_by { |person| [fairness_calculator.weight_of_shifts(person.assigned_shifts), person.random_factor] }
-        chosen_dev = assignable_devs.first
-        chosen_dev.assign(role:, week:)
-        devs_used << chosen_dev
       end
     end
 

@@ -75,19 +75,19 @@ class CombineCSVs
     # Response for each week is either `nil`, or some combination of:
     # "Not available for in-hours, Not available for on-call weekday nights, Not available for on-call over the weekend"
     week_headers = [
-      "Week 1 (03/04/23 - 09/04/23)",
-      "Week 2 (10/04/23 - 16/04/23)",
-      "Week 3 (17/04/23 - 23/04/23)",
-      "Week 4 (24/04/23 - 30/04/23)",
-      "Week 5 (01/05/23 - 07/05/23)",
-      "Week 6 (08/05/23 - 14/05/23)",
-      "Week 7 (15/05/23 - 21/05/23)",
-      "Week 8 (22/05/23 - 28/05/23)",
-      "Week 9 (29/05/23 - 04/06/23)",
-      "Week 10 (05/06/23 - 11/06/23)",
-      "Week 11 (12/06/23 - 18/06/23)",
-      "Week 12 (19/06/23 - 25/06/23)",
-      "Week 13 (26/06/23 - 02/07/23)",
+      "Week 1 (03/07/23 - 09/07/23)",
+      "Week 2 (10/07/23 - 16/07/23)",
+      "Week 3 (17/07/23 - 23/07/23)",
+      "Week 4 (24/07/23 - 30/07/23)",
+      "Week 5 (31/07/23 - 06/08/23)",
+      "Week 6 (07/08/23 - 13/08/23)",
+      "Week 7 (14/08/23 - 20/08/23)",
+      "Week 8 (21/08/23 - 27/08/23)",
+      "Week 9 (28/08/23 - 03/09/23)",
+      "Week 10 (04/09/23 - 10/09/23)",
+      "Week 11 (11/09/23 - 17/09/23)",
+      "Week 12 (18/09/23 - 24/09/23)",
+      "Week 13 (25/09/23 - 01/10/23)",
     ]
 
     csv.each.with_index(1).map do |row, index|
@@ -140,7 +140,21 @@ private
     # TODO: iterate. But for now, we'll class the entire week as forbidden
     # regardless of whether in-hours, on-call weekdays or on-call weekend were checked
     unless response[:limited_weeks].nil?
-      person[:forbidden_weeks] = response[:limited_weeks].map { |week| week[:week] unless week[:limitations].nil? }.compact.join(",")
+      forbidden_weeks = response[:limited_weeks].map do |week|
+        if week[:limitations].nil?
+          nil
+        elsif (!person[:can_do_oncall_primary] && !person[:can_do_oncall_secondary])
+          # some devs tick the "Not available for on-call" options even if they've opted out of on-call 'globally' (the "Should be scheduled for on-call?" cell in the "Technical support" sheet).
+          # This would make _every_ week a 'forbidden week'.
+          # We should therefore only look at the in-hours availability of these devs when determining forbidden weeks.
+          week[:limitations][:no_in_hours] ? week[:week] : nil
+        else
+          week[:week]
+        end
+      end
+
+
+      person[:forbidden_weeks] = forbidden_weeks.compact.join(",")
     end
 
     person
