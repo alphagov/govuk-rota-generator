@@ -65,6 +65,7 @@ RSpec.describe GenerateRota do
   end
 
   it "can handle real datasets" do
+    # Chosen seed is arbitrary, needed to ensure tests for random factor in sort are stable
     Randomiser.instance.set_seed(5959)
     rota_generator = described_class.new(csv: "#{fixture_path}/availability.csv")
     roles_config = {
