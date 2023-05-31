@@ -83,7 +83,6 @@ class GenerateRota
   def to_csv
     slots = slots_filled(@people)
     weeks = slots.map { |slot| slot[:week] }.uniq.max
-    # roles = slots.map { |slot| slot[:role] }.uniq
     roles = %i[inhours_primary inhours_secondary inhours_shadow inhours_primary_standby inhours_secondary_standby oncall_primary oncall_secondary]
     columns = %w[week] + roles
     csv_lines = [columns]
