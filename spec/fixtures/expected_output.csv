@@ -1,14 +1,14 @@
-week,inhours_primary,inhours_secondary,inhours_shadow,inhours_primary_standby,inhours_secondary_standby,oncall_primary,oncall_secondary
-1,Grigori Ivanov,Kofi Mensah,Juliette Moreau,Fatima Al-Zahra,Xoliswa Dlamini,Pilar Sánchez,Ngozi Okonkwo
-2,Xoliswa Dlamini,Hana Kim,Juliette Moreau,Chen Li,Oskar Svensson,Devika Patel,Wojciech Kowalski
-3,Rania Zadeh,Quyền Nguyễn,Juliette Moreau,Valentina Silva,Emilio Rossi,Aiden Smith,Zara Öztürk
-4,Oskar Svensson,Mateo Garcia,Juliette Moreau,Laila Naser,Tessa Van der Meer,Ngozi Okonkwo,Uday Khanna
-5,Chen Li,Emilio Rossi,Juliette Moreau,Ichiro Tanaka,Stefan Popescu,Wojciech Kowalski,Grigori Ivanov
-6,Emilio Rossi,Tessa Van der Meer,Juliette Moreau,Ichiro Tanaka,Stefan Popescu,Rania Zadeh,Yosef Cohen
-7,Stefan Popescu,Quyền Nguyễn,,Laila Naser,Valentina Silva,Zara Öztürk,Uday Khanna
-8,Laila Naser,Hana Kim,,Valentina Silva,Kofi Mensah,Pilar Sánchez,Yosef Cohen
-9,Valentina Silva,Kofi Mensah,Juliette Moreau,Chen Li,Ichiro Tanaka,Devika Patel,Xoliswa Dlamini
-10,Stefan Popescu,Tessa Van der Meer,Juliette Moreau,Ichiro Tanaka,Mateo Garcia,Grigori Ivanov,Beatriz Gomez
-11,Chen Li,Quyền Nguyễn,Juliette Moreau,Oskar Svensson,Mateo Garcia,Beatriz Gomez,Fatima Al-Zahra
-12,Laila Naser,Mateo Garcia,Juliette Moreau,Oskar Svensson,Hana Kim,Xoliswa Dlamini,Fatima Al-Zahra
-13,Oskar Svensson,Hana Kim,Juliette Moreau,Emilio Rossi,Kofi Mensah,Beatriz Gomez,Ngozi Okonkwo
+week,inhours_primary,inhours_secondary,inhours_primary_standby,inhours_secondary_standby,oncall_primary,oncall_secondary
+1,Grigori Ivanov,Kofi Mensah,Fatima Al-Zahra,Xoliswa Dlamini,Pilar Sánchez,Ngozi Okonkwo
+2,Xoliswa Dlamini,Hana Kim,Chen Li,Oskar Svensson,Devika Patel,Wojciech Kowalski
+3,Rania Zadeh,Quyền Nguyễn,Valentina Silva,Emilio Rossi,Aiden Smith,Zara Öztürk
+4,Oskar Svensson,Mateo Garcia,Laila Naser,Tessa Van der Meer,Ngozi Okonkwo,Uday Khanna
+5,Chen Li,Emilio Rossi,Ichiro Tanaka,Stefan Popescu,Wojciech Kowalski,Grigori Ivanov
+6,Emilio Rossi,Tessa Van der Meer,Ichiro Tanaka,Stefan Popescu,Rania Zadeh,Yosef Cohen
+7,Stefan Popescu,Quyền Nguyễn,Laila Naser,Valentina Silva,Zara Öztürk,Uday Khanna
+8,Laila Naser,Hana Kim,Valentina Silva,Kofi Mensah,Pilar Sánchez,Yosef Cohen
+9,Valentina Silva,Kofi Mensah,Chen Li,Ichiro Tanaka,Devika Patel,Xoliswa Dlamini
+10,Stefan Popescu,Tessa Van der Meer,Ichiro Tanaka,Mateo Garcia,Grigori Ivanov,Beatriz Gomez
+11,Chen Li,Quyền Nguyễn,Oskar Svensson,Mateo Garcia,Beatriz Gomez,Fatima Al-Zahra
+12,Laila Naser,Mateo Garcia,Oskar Svensson,Hana Kim,Xoliswa Dlamini,Fatima Al-Zahra
+13,Oskar Svensson,Hana Kim,Emilio Rossi,Kofi Mensah,Beatriz Gomez,Ngozi Okonkwo

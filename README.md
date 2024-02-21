@@ -4,7 +4,7 @@ Generates a balanced rota, taking into account each developer's availability and
 
 There are some limitations to the generator, which we hope to resolve in future iterations:
 
-1. Currently no way of capping certain shift types (e.g. maximum two shadow shifts).
+1. Currently no way of capping certain shift types.
 1. It doesn't account for different working patterns (e.g. devs who don't work Fridays currently have to find cover)
 1. The week is marked as 'unavailable' even if only one cover type is off limits. For example, a developer may say they're unavailable to do on-call at the weekend, but they would still be available to do in-hours shifts.
 1. It doesn't account for bank holidays.
@@ -43,6 +43,6 @@ Timestamp,What is your name,What team will you be on? (team),"If you work differ
 The generated file will look something like:
 
 ```csv
-name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_shadow,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
+name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
 Some Person,Find and View,false,false,false,false,false,true,true,"6,10"
 ```

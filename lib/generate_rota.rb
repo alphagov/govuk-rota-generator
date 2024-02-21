@@ -41,7 +41,7 @@ class GenerateRota
       devs_used = []
       week_roles_availability.each do |role, available_devs|
         # We could raise an exception, but it's usually more helpful to generate a rough rota.
-        if available_devs.count.zero? && role_mandatory?(roles_config, role)
+        if available_devs.count.zero?
           puts "WARNING: nobody is available for #{role} in week #{week}"
         elsif (remaining_devs = available_devs - devs_used) && remaining_devs.count.zero?
           puts "WARNING: can't fill #{role} in week #{week} because all eligible devs are already assigned to other roles."
@@ -58,12 +58,6 @@ class GenerateRota
     slots_filled(people)
   end
 
-  def role_mandatory?(roles_config, role)
-    return false if roles_config.dig(role, :optional) == true
-
-    true
-  end
-
   def slots_filled(people)
     shifts = people.reduce([]) do |arr, person|
       arr + person.assigned_shifts.map { |shift| shift.merge(assignee: person.name) }
@@ -78,7 +72,7 @@ class GenerateRota
   def to_csv
     slots = slots_filled(@people)
     weeks = slots.map { |slot| slot[:week] }.uniq.max
-    roles = %i[inhours_primary inhours_secondary inhours_shadow inhours_primary_standby inhours_secondary_standby oncall_primary oncall_secondary]
+    roles = %i[inhours_primary inhours_secondary inhours_primary_standby inhours_secondary_standby oncall_primary oncall_secondary]
     columns = %w[week] + roles
     csv_lines = [columns]
     weeks.times.each do |week_index|
@@ -105,7 +99,6 @@ private
       can_do_roles = [
         person_hash[:can_do_inhours_primary] == "true" ? :inhours_primary : nil,
         person_hash[:can_do_inhours_secondary] == "true" ? :inhours_secondary : nil,
-        person_hash[:can_do_inhours_shadow] == "true" ? :inhours_shadow : nil,
         person_hash[:can_do_inhours_primary_standby] == "true" ? :inhours_primary_standby : nil,
         person_hash[:can_do_inhours_secondary_standby] == "true" ? :inhours_secondary_standby : nil,
         person_hash[:can_do_oncall_primary] == "true" ? :oncall_primary : nil,

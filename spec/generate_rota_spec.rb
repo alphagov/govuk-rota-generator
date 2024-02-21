@@ -82,10 +82,6 @@ RSpec.describe GenerateRota do
       inhours_secondary_standby: {
         value: 0.75,
       },
-      inhours_shadow: {
-        value: 0,
-        optional: true,
-      },
       oncall_primary: {
         value: 2.5,
       },
