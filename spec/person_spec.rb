@@ -11,7 +11,6 @@ RSpec.describe Person do
         inhours_primary_standby
         inhours_secondary_standby
         oncall_primary
-        oncall_secondary
       ],
       forbidden_weeks: [3, 7],
     )
@@ -36,7 +35,7 @@ RSpec.describe Person do
     end
 
     it "returns `false` for roles that the person cannot do" do
-      expect(person.can_do_role?(:inhours_shadow)).to eq(false)
+      expect(person.can_do_role?(:oncall_secondary)).to eq(false)
     end
   end
 
@@ -48,7 +47,6 @@ RSpec.describe Person do
         inhours_primary_standby
         inhours_secondary_standby
         oncall_primary
-        oncall_secondary
       ])
     end
 
@@ -67,7 +65,7 @@ RSpec.describe Person do
     end
 
     it "raises an error when assigning an unsupported role in an available week" do
-      expect { person.assign(role: :inhours_shadow, week: 3) }.to raise_exception(ForbiddenRoleException)
+      expect { person.assign(role: :oncall_secondary, week: 3) }.to raise_exception(ForbiddenRoleException)
     end
 
     it "raises an error when assigning multiple supported roles in an available week" do

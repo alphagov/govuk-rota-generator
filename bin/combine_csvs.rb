@@ -2,7 +2,7 @@ require "csv"
 
 # THE AIM IS TO CONVERT TWO CSVs INTO THE FORMAT govuk-rota-generators UNDERSTANDS, i.e.
 #
-# name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_shadow,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
+# name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
 # Oswaldo Bonham,Platform Health,yes,yes,no,yes,yes,yes,yes,
 #
 class CombineCSVs
@@ -35,7 +35,7 @@ class CombineCSVs
   # {"Name"=>"Foo Bar", "Role"=>"Junior Software Developer", "Contractor?"=>"No", "Role allows doing in-hours?"=>"Yes", "Can do in-hours secondary?"=>"No", "Eligible for in-hours primary?"=>"No", "Role allows doing on-call?"=>"No", "Eligible for on-call primary?"=>"No", "Eligible for on-call secondary?"=>"No", "Exempt from on-call duties?"=>"N/A", "Should be scheduled for on-call?"=>"No", "Works Mondays?"=>"Yes", "Works Tuesdays?"=>"Yes", "Works Wednesdays?"=>"Yes", "Works Thursdays?"=>"Yes", "Works Fridays?"=>"Yes"}
   #
   # Output from this method looks like:
-  # {:name=>"Foo Bar", :team=>nil, :can_do_inhours_primary=>false, :can_do_inhours_secondary=>false, :can_do_inhours_shadow=>true, :can_do_inhours_primary_standby=>false, :can_do_inhours_secondary_standby=>false, :can_do_oncall_primary=>false, :can_do_oncall_secondary=>false, :forbidden_weeks=>nil}
+  # {:name=>"Foo Bar", :team=>nil, :can_do_inhours_primary=>false, :can_do_inhours_secondary=>false, :can_do_inhours_primary_standby=>false, :can_do_inhours_secondary_standby=>false, :can_do_oncall_primary=>false, :can_do_oncall_secondary=>false, :forbidden_weeks=>nil}
   def people
     csv = CSV.read(File.dirname(__FILE__) + "/../data/people.csv", headers: true)
 
@@ -46,7 +46,6 @@ class CombineCSVs
         team: nil, # This will be populated in another step
         can_do_inhours_primary: tmp_data["Eligible for in-hours primary?"] == "Yes",
         can_do_inhours_secondary: tmp_data["Can do in-hours secondary?"] == "Yes",
-        can_do_inhours_shadow: tmp_data["Role allows doing in-hours?"] == "Yes" && tmp_data["Can do in-hours secondary?"] == "No",
         can_do_inhours_primary_standby: tmp_data["Eligible for in-hours primary?"] == "Yes",
         can_do_inhours_secondary_standby: tmp_data["Can do in-hours secondary?"] == "Yes",
         can_do_oncall_primary: tmp_data["Should be scheduled for on-call?"] == "Yes",
