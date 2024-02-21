@@ -69,5 +69,15 @@ RSpec.describe CsvValidator do
         "Expected 'Week commencing 16/04/2024' to be 'Week commencing 15/04/2024'",
       )
     end
+
+    it "raises an exception if the first date isn't a Monday" do
+      bad_headers = valid_headers
+      bad_headers[valid_headers.count - 2] = "Week commencing 02/04/2024"
+
+      expect { described_class.validate_columns([bad_headers]) }.to raise_exception(
+        InvalidStructureException,
+        "Expected column 'Week commencing 02/04/2024' to correspond to a Monday, but it's a Tuesday.",
+      )
+    end
   end
 end

@@ -1,3 +1,5 @@
+require "date"
+
 class InvalidStructureException < StandardError; end
 
 class CsvValidator
@@ -33,6 +35,12 @@ class CsvValidator
 
   def self.validate_week_dates(week_dates)
     date_this_week = week_dates.shift(1).first
+    day_of_week = Date.parse(date_this_week).strftime("%A")
+
+    unless day_of_week == "Monday"
+      raise InvalidStructureException, "Expected column 'Week commencing #{date_this_week}' to correspond to a Monday, but it's a #{day_of_week}."
+    end
+
     week_dates.each do |date_next_week|
       expected_next_date = (Date.parse(date_this_week) + 7).strftime("%d/%m/%Y")
       unless date_next_week == expected_next_date
