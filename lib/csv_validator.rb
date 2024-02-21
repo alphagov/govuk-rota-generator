@@ -26,6 +26,19 @@ class CsvValidator
       end
     end
 
+    validate_week_dates(week_columns.map { |hash| hash[:value].sub("Week commencing ", "") })
+
     true
+  end
+
+  def self.validate_week_dates(week_dates)
+    date_this_week = week_dates.shift(1).first
+    week_dates.each do |date_next_week|
+      expected_next_date = (Date.parse(date_this_week) + 7).strftime("%d/%m/%Y")
+      unless date_next_week == expected_next_date
+        raise InvalidStructureException, "Expected 'Week commencing #{date_next_week}' to be 'Week commencing #{expected_next_date}'"
+      end
+      date_this_week = date_next_week
+    end
   end
 end

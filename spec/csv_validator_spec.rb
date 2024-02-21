@@ -57,5 +57,17 @@ RSpec.describe CsvValidator do
         "Expected 'Week commencing 01/04/2024' to match '(?-mix:^Need to elaborate on any of the above\\?)'",
       )
     end
+
+    it "raises an exception if the dates given aren't exactly 7 days apart" do
+      headers_with_inconsistent_dates = valid_headers.insert(valid_headers.count - 1, [
+        "Week commencing 08/04/2024",
+        "Week commencing 16/04/2024", # should be 15th
+      ]).flatten
+
+      expect { described_class.validate_columns([headers_with_inconsistent_dates]) }.to raise_exception(
+        InvalidStructureException,
+        "Expected 'Week commencing 16/04/2024' to be 'Week commencing 15/04/2024'",
+      )
+    end
   end
 end
