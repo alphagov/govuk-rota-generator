@@ -16,7 +16,7 @@ class GoogleSheet
     @sheets_api = sheets_api
   end
 
-  def fetch(sheet_id:, range:)
+  def fetch(sheet_id:, range: "Form responses 1!A1:Z")
     @sheets_api.get_spreadsheet_values(sheet_id, range)
   end
 end
