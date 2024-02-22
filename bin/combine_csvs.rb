@@ -1,4 +1,12 @@
 require "csv"
+require_relative "../lib/google_sheet"
+require_relative "../lib/csv_validator"
+
+AVAILABILITY_SHEET_ID = "1YV0e18wP0g3RsG146osvJLostYZgL9XS2jDGLQEgm2Q"
+TECHNICAL_SUPPORT_SHEET_ID = "1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU"
+RESPONSES_CSV = File.dirname(__FILE__) + "/../data/responses.csv"
+PEOPLE_CSV = File.dirname(__FILE__) + "/../data/people.csv"
+COMBINED_CSV = File.dirname(__FILE__) + "/../data/combined.csv"
 
 # THE AIM IS TO CONVERT TWO CSVs INTO THE FORMAT govuk-rota-generators UNDERSTANDS, i.e.
 #
@@ -147,8 +155,19 @@ private
   end
 end
 
-generated_data = CombineCSVs.new.combined_data
+puts "Fetching developer availability..."
+responses = GoogleSheet.new.fetch(sheet_id: AVAILABILITY_SHEET_ID, filepath: RESPONSES_CSV)
+puts "...downloaded to #{RESPONSES_CSV}"
+puts "Validating data..."
+CsvValidator.validate_columns(responses)
+puts "...validated."
 
+puts "Fetching 'Technical support' sheet..."
+GoogleSheet.new.fetch(sheet_id: TECHNICAL_SUPPORT_SHEET_ID, range: "Technical support!A1:Z", filepath: PEOPLE_CSV)
+puts "...downloaded to #{PEOPLE_CSV}."
+
+puts "Combining data..."
+generated_data = CombineCSVs.new.combined_data
 # https://stackoverflow.com/a/17864876
 column_names = generated_data.first.keys
 s = CSV.generate do |csv|
@@ -157,4 +176,5 @@ s = CSV.generate do |csv|
     csv << x.values
   end
 end
-File.write(File.dirname(__FILE__) + "/../data/combined.csv", s)
+File.write(COMBINED_CSV, s)
+puts "...data combined and stored in #{COMBINED_CSV}."
