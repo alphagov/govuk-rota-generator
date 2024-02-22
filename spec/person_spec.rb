@@ -3,7 +3,7 @@ require "person"
 RSpec.describe Person do
   let(:person) do
     described_class.new(
-      name: "Dev Eloper",
+      email: "developer@digital.cabinet-office.gov.uk",
       team: "Platform Reliability",
       can_do_roles: %i[
         inhours_primary
@@ -16,9 +16,9 @@ RSpec.describe Person do
     )
   end
 
-  describe "#name" do
-    it "returns the person's name" do
-      expect(person.name).to eq("Dev Eloper")
+  describe "#email" do
+    it "returns the person's email" do
+      expect(person.email).to eq("developer@digital.cabinet-office.gov.uk")
     end
   end
 

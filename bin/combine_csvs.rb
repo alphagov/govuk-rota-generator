@@ -2,7 +2,7 @@ require "csv"
 
 # THE AIM IS TO CONVERT TWO CSVs INTO THE FORMAT govuk-rota-generators UNDERSTANDS, i.e.
 #
-# name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
+# email,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
 # Oswaldo Bonham,Platform Health,yes,yes,no,yes,yes,yes,yes,
 #
 class CombineCSVs
@@ -12,7 +12,7 @@ class CombineCSVs
     validate_combined_data(people_data, responses_data)
 
     combined = people_data.map do |row|
-      response = responses_data.find { |response| response[:name] == row[:name] }
+      response = responses_data.find { |response| response[:email] == row[:email] }
       if response
         merge_datasets(row, response)
       else
@@ -25,24 +25,24 @@ class CombineCSVs
 
   # Input is a CSV with headings like this:
   #
-  # Name,Role,Contractor?,Role allows doing in-hours?,Can do in-hours secondary?,
+  # Email,Role,Contractor?,Role allows doing in-hours?,Can do in-hours secondary?,
   # Eligible for in-hours primary?,Role allows doing on-call?
   # Eligible for on-call primary?,Eligible for on-call secondary?
   # Exempt from on-call duties?,Should be scheduled for on-call?
   # Works Mondays?,Works Tuesdays?,Works Wednesdays?,Works Thursdays?,Works Fridays?
   #
   # Example row when converted to hash:
-  # {"Name"=>"Foo Bar", "Role"=>"Junior Software Developer", "Contractor?"=>"No", "Role allows doing in-hours?"=>"Yes", "Can do in-hours secondary?"=>"No", "Eligible for in-hours primary?"=>"No", "Role allows doing on-call?"=>"No", "Eligible for on-call primary?"=>"No", "Eligible for on-call secondary?"=>"No", "Exempt from on-call duties?"=>"N/A", "Should be scheduled for on-call?"=>"No", "Works Mondays?"=>"Yes", "Works Tuesdays?"=>"Yes", "Works Wednesdays?"=>"Yes", "Works Thursdays?"=>"Yes", "Works Fridays?"=>"Yes"}
+  # {"Email"=>"Foo Bar", "Role"=>"Junior Software Developer", "Contractor?"=>"No", "Role allows doing in-hours?"=>"Yes", "Can do in-hours secondary?"=>"No", "Eligible for in-hours primary?"=>"No", "Role allows doing on-call?"=>"No", "Eligible for on-call primary?"=>"No", "Eligible for on-call secondary?"=>"No", "Exempt from on-call duties?"=>"N/A", "Should be scheduled for on-call?"=>"No", "Works Mondays?"=>"Yes", "Works Tuesdays?"=>"Yes", "Works Wednesdays?"=>"Yes", "Works Thursdays?"=>"Yes", "Works Fridays?"=>"Yes"}
   #
   # Output from this method looks like:
-  # {:name=>"Foo Bar", :team=>nil, :can_do_inhours_primary=>false, :can_do_inhours_secondary=>false, :can_do_inhours_primary_standby=>false, :can_do_inhours_secondary_standby=>false, :can_do_oncall_primary=>false, :can_do_oncall_secondary=>false, :forbidden_weeks=>nil}
+  # {:email=>"Foo Bar", :team=>nil, :can_do_inhours_primary=>false, :can_do_inhours_secondary=>false, :can_do_inhours_primary_standby=>false, :can_do_inhours_secondary_standby=>false, :can_do_oncall_primary=>false, :can_do_oncall_secondary=>false, :forbidden_weeks=>nil}
   def people
     csv = CSV.read(File.dirname(__FILE__) + "/../data/people.csv", headers: true)
 
     data = csv.each.with_index(1).map do |row, index|
       tmp_data = row.to_h
       {
-        name: tmp_data["Name"],
+        email: tmp_data["Email"],
         team: nil, # This will be populated in another step
         can_do_inhours_primary: tmp_data["Eligible for in-hours primary?"] == "Yes",
         can_do_inhours_secondary: tmp_data["Can do in-hours secondary?"] == "Yes",
@@ -53,12 +53,12 @@ class CombineCSVs
         forbidden_weeks: nil, # This will be populated in another step
       }
     end
-    data.reject { |row| row[:name].nil? } # there's a blank row between the header and the real data
+    data.reject { |row| row[:email].nil? } # there's a blank row between the header and the real data
   end
 
   # Input is a CSV with headings like this:
   #
-  # Timestamp,What is your name,What team will you be on? (team),
+  # Timestamp,Email address,What team will you be on? (team),
   # "If you work different hours to the 9.30am-5.30pm 2nd line shifts, please state your hours",
   # Do you have any non working days? [Non working day(s)],
   # Week 1 (03/04/23 - 09/04/23),Week 2 (10/04/23 - 16/04/23),Week 3 (17/04/23 - 23/04/23),Week 4 (24/04/23 - 30/04/23),Week 5 (01/05/23 - 07/05/23),Week 6 (08/05/23 - 14/05/23),Week 7 (15/05/23 - 21/05/23),Week 8 (22/05/23 - 28/05/23),Week 9 (29/05/23 - 04/06/23),Week 10 (05/06/23 - 11/06/23),Week 11 (12/06/23 - 18/06/23),Week 12 (19/06/23 - 25/06/23),Week 13 (26/06/23 - 02/07/23),Need to elaborate on any of the above?
@@ -73,21 +73,7 @@ class CombineCSVs
     #
     # Response for each week is either `nil`, or some combination of:
     # "Not available for in-hours, Not available for on-call weekday nights, Not available for on-call over the weekend"
-    week_headers = [
-      "Week 1 (03/07/23 - 09/07/23)",
-      "Week 2 (10/07/23 - 16/07/23)",
-      "Week 3 (17/07/23 - 23/07/23)",
-      "Week 4 (24/07/23 - 30/07/23)",
-      "Week 5 (31/07/23 - 06/08/23)",
-      "Week 6 (07/08/23 - 13/08/23)",
-      "Week 7 (14/08/23 - 20/08/23)",
-      "Week 8 (21/08/23 - 27/08/23)",
-      "Week 9 (28/08/23 - 03/09/23)",
-      "Week 10 (04/09/23 - 10/09/23)",
-      "Week 11 (11/09/23 - 17/09/23)",
-      "Week 12 (18/09/23 - 24/09/23)",
-      "Week 13 (25/09/23 - 01/10/23)",
-    ]
+    week_headers = csv.headers.select { |header| header.match(/^Week commencing/) }
 
     csv.each.with_index(1).map do |row, index|
       tmp_data = row.to_h
@@ -97,7 +83,8 @@ class CombineCSVs
           week: (index + 1),
           limitations: nil,
         }
-        unless tmp_data[header].nil?
+
+        unless tmp_data[header].empty?
           week_obj[:limitations] = {
             no_in_hours: !tmp_data[header].match(/Not available for in-hours/).nil?,
             no_oncall_weekdays: !tmp_data[header].match(/Not available for on-call weekday nights/).nil?,
@@ -108,7 +95,7 @@ class CombineCSVs
       end
 
       {
-        name: tmp_data["What is your name"],
+        email: tmp_data["Email address"],
         team: tmp_data["What team will you be on? (team)"],
         limited_weeks: limited_weeks,
       }
@@ -118,8 +105,8 @@ class CombineCSVs
 private
 
   def validate_combined_data(people_data, responses_data)
-    people_names = people_data.map { |row| row[:name] }
-    responses_names = responses_data.map { |row| row[:name] }
+    people_names = people_data.map { |row| row[:email] }
+    responses_names = responses_data.map { |row| row[:email] }
 
     unrecognised_responses = responses_names - people_names
     unless unrecognised_responses.count.zero?

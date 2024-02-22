@@ -60,7 +60,7 @@ class GenerateRota
 
   def slots_filled(people)
     shifts = people.reduce([]) do |arr, person|
-      arr + person.assigned_shifts.map { |shift| shift.merge(assignee: person.name) }
+      arr + person.assigned_shifts.map { |shift| shift.merge(assignee: person.email) }
     end
     shifts.sort_by { |shift| shift[:week] }
   end
@@ -105,7 +105,7 @@ private
         person_hash[:can_do_oncall_secondary] == "true" ? :oncall_secondary : nil,
       ].compact
       Person.new(
-        name: person_hash[:name],
+        email: person_hash[:email],
         team: person_hash[:team],
         forbidden_weeks:,
         can_do_roles:,
