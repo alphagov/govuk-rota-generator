@@ -15,11 +15,13 @@ We hope one day to make the rota generator think in terms of days rather than we
 
 ## Setup
 
-In GCP, there's a [govuk-rota-generator 'project'](https://console.cloud.google.com/?project=govuk-rota-generator) which has a [google-sheet-fetcher 'service account'](https://console.cloud.google.com/iam-admin/serviceaccounts/details/111167577478691063624;edit=true/keys?orgonly=true&project=govuk-rota-generator&supportedpurview=organizationId) (which automatically has its own email address `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`). From this screen, you can:
+In GCP, there's a [govuk-rota-generator 'project'](https://console.cloud.google.com/?project=govuk-rota-generator) which has a google-sheet-fetcher 'service account' (which automatically has its own email address `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`).
 
-> Add Key -> JSON -> Create
+The 2nd-line-support Google group is an 'Owner' of the service account, so anyone in that group should be able to create a service account key for local use. From the [google-sheet-fetcher service account page](https://console.cloud.google.com/iam-admin/serviceaccounts/details/111167577478691063624;edit=true/keys?orgonly=true&project=govuk-rota-generator&supportedpurview=organizationId):
 
-This will download a JSON file. Store it as `google_service_account_key.json` (which is git-ignored) in this repo.
+1. "Add Key" -> "JSON" -> "Create"
+2. This will download a JSON file.
+3. Store it as `google_service_account_key.json` (which is git-ignored) at the root of this repo.
 
 ## Usage
 
