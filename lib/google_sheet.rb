@@ -16,7 +16,13 @@ class GoogleSheet
     @sheets_api = sheets_api
   end
 
-  def fetch(sheet_id:, range: "Form responses 1!A1:Z")
-    @sheets_api.get_spreadsheet_values(sheet_id, range)
+  def fetch(sheet_id:, range: "Form responses 1!A1:Z", filepath: nil)
+    data = @sheets_api.get_spreadsheet_values(sheet_id, range).values
+
+    if filepath
+      File.write(filepath, data.map(&:to_csv).join)
+    end
+
+    data
   end
 end
