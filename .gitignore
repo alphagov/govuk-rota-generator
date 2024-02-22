@@ -2,3 +2,7 @@
 data/
 
 .byebug_history
+
+google_service_account_key.json
+
+spec/tmp/

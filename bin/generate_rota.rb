@@ -48,5 +48,5 @@ generator.people.sort_by { |person| fairness_calculator.weight_of_shifts(person.
     shift_count = person.assigned_shifts.select { |shift| shift[:role] == role }.count
     "#{shift_count} #{role}"
   end
-  puts "#{person.name} has been allocated #{sprintf('%.1f', fairness_calculator.weight_of_shifts(person.assigned_shifts))} units of inconvenience (#{person.assigned_shifts.count} shifts made up of #{shift_totals.join(',')})"
+  puts "#{person.email} has been allocated #{sprintf('%.1f', fairness_calculator.weight_of_shifts(person.assigned_shifts))} units of inconvenience (#{person.assigned_shifts.count} shifts made up of #{shift_totals.join(',')})"
 end
