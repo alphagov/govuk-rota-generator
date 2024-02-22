@@ -4,6 +4,7 @@ RSpec.describe GoogleSheet do
   before do
     mock_authorizer = instance_double("Google Authorizer", fetch_access_token!: true)
     allow(Google::Auth::ServiceAccountCredentials).to receive(:make_creds).and_return(mock_authorizer)
+    allow(File).to receive(:open).with("./google_service_account_key.json").and_return("{}")
   end
 
   describe "#fetch" do
