@@ -46,6 +46,7 @@ class CsvValidator
       unless date_next_week == expected_next_date
         raise InvalidStructureException, "Expected 'Week commencing #{date_next_week}' to be 'Week commencing #{expected_next_date}'"
       end
+
       date_this_week = date_next_week
     end
   end
