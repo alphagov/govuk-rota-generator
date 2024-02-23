@@ -31,7 +31,7 @@ The 2nd-line-support Google group is an 'Owner' of the service account, so anyon
 2. Update the dates etc, but otherwise make no changes to the form structure
 3. Send out the form, gather responses
 4. Link it to a spreadsheet
-5. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com` (dismiss the warning about sharing with external email addresses)
+5. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`, as a Viewer. (Dismiss the warning about sharing with external email addresses)
 
 ### Get the data ready
 
