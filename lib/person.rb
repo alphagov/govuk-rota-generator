@@ -9,7 +9,7 @@ class ShiftNotAssignedException < StandardError; end
 class Person
   attr_reader :email, :team, :non_working_days, :assigned_shifts, :random_factor
 
-  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days:, forbidden_on_call_days:, non_working_days: [])
+  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [])
     @email = email
     @team = team
     @non_working_days = non_working_days

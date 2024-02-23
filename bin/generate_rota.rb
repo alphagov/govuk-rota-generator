@@ -1,8 +1,11 @@
 require_relative "../lib/rota_generator"
 require_relative "../lib/fairness_calculator"
 
-INPUT_CSV = File.dirname(__FILE__) + "/../data/combined.csv"
-WEEKS_TO_GENERATE = 13
+# TODO take these as CLI args
+FIRST_DATE = "01/04/2024"
+LAST_DATE = "30/06/2024"
+DATA_YML = File.dirname(__FILE__) + "/../data/combined.yml"
+
 ROLES_CONFIG = {
   inhours_primary: {
     value: 1.4,
@@ -42,16 +45,19 @@ ROLES_CONFIG = {
   },
 }
 
-puts "We want to generate a rota of #{WEEKS_TO_GENERATE} weeks, with the following roles in each week: #{ROLES_CONFIG.keys.join(", ")}"
-slots_to_fill = WEEKS_TO_GENERATE * ROLES_CONFIG.keys.count
-generator = RotaGenerator.new(csv: INPUT_CSV)
+generator = RotaGenerator.new(yml: DATA_YML)
+people = generator.people
 
-puts "There are #{slots_to_fill} slots to fill, and #{generator.people.count} people on the rota."
-puts "Each person therefore needs to take an average of #{slots_to_fill / generator.people.count.to_f} slot(s)."
-puts ""
+dates = [FIRST_DATE]
+tmp = FIRST_DATE
+while Date.parse(tmp).strftime("%d/%m/%Y") != LAST_DATE
+  tmp = (Date.parse(tmp) + 1).strftime("%d/%m/%Y")
+  dates << tmp
+end
+
 generator.fill_slots(
-  generator.people,
-  generator.slots_to_fill(WEEKS_TO_GENERATE, ROLES_CONFIG),
+  people,
+  generator.slots_to_fill(dates, ROLES_CONFIG),
   ROLES_CONFIG,
 )
 puts "All shifts allocated. See CSV below:"
