@@ -14,7 +14,22 @@ RSpec.describe Person do
         inhours_secondary_standby
         oncall_primary
       ],
-      forbidden_weeks: [3, 7],
+      forbidden_in_hours_days: [
+        "01/04/2024", # Monday
+        "02/04/2024",
+        "03/04/2024",
+        "04/04/2024",
+        "05/04/2024", # ...to Friday
+      ],
+      forbidden_on_call_days: [
+        "01/04/2024", # Monday
+        "02/04/2024",
+        "03/04/2024",
+        "04/04/2024",
+        "05/04/2024", # ...to Friday
+        "06/04/2024", # Saturday
+        "07/04/2024", # Sunday
+      ],
     }
   end
 
@@ -60,8 +75,8 @@ RSpec.describe Person do
   end
 
   describe "#availability" do
-    it "returns a list of roles the person can do in the given week" do
-      expect(person.availability(week: 1)).to eq(%i[
+    it "returns a list of roles the person can do on the given date" do
+      expect(person.availability(date: "08/04/2024")).to eq(%i[
         inhours_primary
         inhours_secondary
         inhours_primary_standby
@@ -70,40 +85,49 @@ RSpec.describe Person do
       ])
     end
 
-    it "returns an empty array if the week is a 'forbidden' one" do
-      expect(person.availability(week: 3)).to eq([])
+    it "returns an empty array if both in-hours and on-call are 'forbidden'" do
+      expect(person.availability(date: "01/04/2024")).to eq([])
+    end
+
+    it "marks as unavailable any days already allocated to a shift" do
+      person.assign(role: :inhours_primary, date: "08/04/2024")
+      expect(person.availability(date: "08/04/2024")).to eq([])
     end
   end
 
   describe "#assign" do
-    it "allows assigning a supported role in an available week" do
-      expect { person.assign(role: :inhours_primary, week: 1) }.not_to raise_exception
+    it "allows assigning a supported role on an available date" do
+      expect { person.assign(role: :inhours_primary, date: "08/04/2024") }.not_to raise_exception
     end
 
-    it "raises an error when assigning a supported role in a forbidden week" do
-      expect { person.assign(role: :inhours_primary, week: 3) }.to raise_exception(ForbiddenWeekException)
+    it "raises an error when assigning a supported in-hours role on a forbidden date" do
+      expect { person.assign(role: :inhours_primary, date: "01/04/2024") }.to raise_exception(ForbiddenDateException)
     end
 
-    it "raises an error when assigning an unsupported role in an available week" do
-      expect { person.assign(role: :oncall_secondary, week: 3) }.to raise_exception(ForbiddenRoleException)
+    it "raises an error when assigning a supported on-call role on an available date" do
+      expect { person.assign(role: :oncall_primary, date: "07/04/2024") }.to raise_exception(ForbiddenDateException)
     end
 
-    it "raises an error when assigning multiple supported roles in an available week" do
-      expect { person.assign(role: :inhours_primary, week: 1) }.not_to raise_exception
-      expect { person.assign(role: :inhours_secondary, week: 1) }.to raise_exception(MultipleRolesException)
+    it "raises an error when assigning an unsupported role on an available date" do
+      expect { person.assign(role: :oncall_secondary, date: "08/04/2024") }.to raise_exception(ForbiddenRoleException)
+    end
+
+    it "raises an error when assigning multiple supported roles on an available date" do
+      expect { person.assign(role: :inhours_primary, date: "08/04/2024") }.not_to raise_exception
+      expect { person.assign(role: :inhours_secondary, date: "08/04/2024") }.to raise_exception(MultipleRolesException)
     end
   end
 
   describe "#unassign" do
     it "allows unassigning an existing assigned shift" do
-      person.assign(role: :inhours_primary, week: 1)
-      expect { person.unassign(role: :inhours_primary, week: 1) }.not_to raise_exception
+      person.assign(role: :inhours_primary, date: "08/04/2024")
+      expect { person.unassign(role: :inhours_primary, date: "08/04/2024") }.not_to raise_exception
     end
 
     it "raises an error when unassigning a shift that has already been unassigned" do
-      person.assign(role: :inhours_primary, week: 1)
-      expect { person.unassign(role: :inhours_primary, week: 1) }.not_to raise_exception
-      expect { person.unassign(role: :inhours_primary, week: 1) }.to raise_exception(ShiftNotAssignedException)
+      person.assign(role: :inhours_primary, date: "08/04/2024")
+      expect { person.unassign(role: :inhours_primary, date: "08/04/2024") }.not_to raise_exception
+      expect { person.unassign(role: :inhours_primary, date: "08/04/2024") }.to raise_exception(ShiftNotAssignedException)
     end
   end
 
@@ -113,33 +137,33 @@ RSpec.describe Person do
     end
 
     it "returns an array of all shifts that have been assigned" do
-      person.assign(role: :inhours_primary, week: 1)
-      person.assign(role: :inhours_secondary, week: 2)
+      person.assign(role: :inhours_primary, date: "08/04/2024")
+      person.assign(role: :inhours_primary, date: "09/04/2024")
       expect(person.assigned_shifts).to eq([
         {
-          week: 1,
+          date: "08/04/2024",
           role: :inhours_primary,
         },
         {
-          week: 2,
-          role: :inhours_secondary,
+          date: "09/04/2024",
+          role: :inhours_primary,
         },
       ])
     end
 
     it "returns an array of all shifts that have been assigned and doesn't include any unassigned ones" do
-      person.assign(role: :inhours_primary, week: 1)
-      person.assign(role: :inhours_secondary, week: 2)
-      person.assign(role: :oncall_primary, week: 4)
-      person.unassign(role: :inhours_secondary, week: 2)
+      person.assign(role: :inhours_primary, date: "08/04/2024")
+      person.assign(role: :inhours_primary, date: "09/04/2024")
+      person.assign(role: :inhours_primary, date: "10/04/2024")
+      person.unassign(role: :inhours_primary, date: "09/04/2024")
       expect(person.assigned_shifts).to eq([
         {
-          week: 1,
+          date: "08/04/2024",
           role: :inhours_primary,
         },
         {
-          week: 4,
-          role: :oncall_primary,
+          date: "10/04/2024",
+          role: :inhours_primary,
         },
       ])
     end
