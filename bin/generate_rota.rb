@@ -1,4 +1,4 @@
-require_relative "../lib/generate_rota"
+require_relative "../lib/rota_generator"
 require_relative "../lib/fairness_calculator"
 
 INPUT_CSV = File.dirname(__FILE__) + "/../data/combined.csv"
@@ -26,7 +26,7 @@ ROLES_CONFIG = {
 
 puts "We want to generate a rota of #{WEEKS_TO_GENERATE} weeks, with the following roles in each week: #{ROLES_CONFIG.keys.join(", ")}"
 slots_to_fill = WEEKS_TO_GENERATE * ROLES_CONFIG.keys.count
-generator = GenerateRota.new(csv: INPUT_CSV)
+generator = RotaGenerator.new(csv: INPUT_CSV)
 
 puts "There are #{slots_to_fill} slots to fill, and #{generator.people.count} people on the rota."
 puts "Each person therefore needs to take an average of #{slots_to_fill / generator.people.count.to_f} slot(s)."

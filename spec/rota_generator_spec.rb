@@ -1,7 +1,7 @@
-require "generate_rota"
+require "rota_generator"
 require "person"
 
-RSpec.describe GenerateRota do
+RSpec.describe RotaGenerator do
   let(:fixture_path) { "#{File.dirname(__FILE__)}/fixtures/" }
   let(:roles_config) do
     {
