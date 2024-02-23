@@ -2,7 +2,7 @@ require "csv"
 require_relative "./person"
 require_relative "./fairness_calculator"
 
-class GenerateRota
+class RotaGenerator
   attr_reader :people
 
   def initialize(csv: nil)
