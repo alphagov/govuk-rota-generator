@@ -1,3 +1,4 @@
+require "date"
 require_relative "./randomiser"
 
 class ForbiddenRoleException < StandardError; end
@@ -6,11 +7,12 @@ class MultipleRolesException < StandardError; end
 class ShiftNotAssignedException < StandardError; end
 
 class Person
-  attr_reader :email, :team, :assigned_shifts, :random_factor
+  attr_reader :email, :team, :non_working_days, :assigned_shifts, :random_factor
 
-  def initialize(email:, team:, can_do_roles:, forbidden_weeks:)
+  def initialize(email:, team:, can_do_roles:, forbidden_weeks:, non_working_days: [])
     @email = email
     @team = team
+    @non_working_days = non_working_days
     @can_do_roles = can_do_roles
     @forbidden_weeks = forbidden_weeks
     @assigned_shifts = []
