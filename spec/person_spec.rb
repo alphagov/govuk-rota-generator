@@ -1,10 +1,12 @@
 require "person"
 
 RSpec.describe Person do
-  let(:person) do
-    described_class.new(
+  let(:person) { described_class.new(**person_configuration) }
+  let(:person_configuration) do
+    {
       email: "developer@digital.cabinet-office.gov.uk",
       team: "Platform Reliability",
+      non_working_days: %w[Friday],
       can_do_roles: %i[
         inhours_primary
         inhours_secondary
@@ -13,7 +15,7 @@ RSpec.describe Person do
         oncall_primary
       ],
       forbidden_weeks: [3, 7],
-    )
+    }
   end
 
   describe "#email" do
@@ -25,6 +27,17 @@ RSpec.describe Person do
   describe "#team" do
     it "returns the person's team" do
       expect(person.team).to eq("Platform Reliability")
+    end
+  end
+
+  describe "#non_working_days" do
+    it "returns array of non-working days" do
+      expect(person.non_working_days).to eq(%w[Friday])
+    end
+
+    it "returns empty array if unspecified" do
+      person_configuration.delete(:non_working_days)
+      expect(person.non_working_days).to eq([])
     end
   end
 
