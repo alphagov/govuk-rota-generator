@@ -19,6 +19,10 @@ class Person
     @random_factor = Randomiser.instance.next_float
   end
 
+  def name
+    email.match(/(.+)@(.+)$/)[1].split(".").map(&:capitalize).join(" ")
+  end
+
   def can_do_role?(role)
     @can_do_roles.include?(role)
   end

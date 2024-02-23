@@ -24,6 +24,13 @@ RSpec.describe Person do
     end
   end
 
+  describe "#name" do
+    it "derives the name from the person's email" do
+      person_configuration[:email] = "norbert.o'hara@digital.cabinet-office.gov.uk"
+      expect(person.name).to eq("Norbert O'hara")
+    end
+  end
+
   describe "#team" do
     it "returns the person's team" do
       expect(person.team).to eq("Platform Reliability")
