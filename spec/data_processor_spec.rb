@@ -45,4 +45,93 @@ RSpec.describe DataProcessor do
       described_class.combine_raw(people_data, responses_data)
     end
   end
+
+  describe "validate_responses" do
+    let(:responses_csv) { "foo.csv" }
+    let(:valid_headers) do
+      [
+        "Timestamp",
+        "Email address",
+        "Have you been given an exemption from on call?\n\nPlease select \"Yes\" only if you've opted out (with Senior Tech approval). Don't worry about checking the box if you're ineligible for on-call (e.g. Frontend Developer, or lack of prod access) - you'll be automatically opted out.",
+        "Do you have any non working days? [Non working day(s)]",
+        "What team/area are you in (or will be in when this rota starts)?",
+        "If you work different hours to the 9.30am-5.30pm 2nd line shifts, please state your hours",
+        "Week commencing 01/04/2024",
+        "Need to elaborate on any of the above?",
+      ]
+    end
+
+    def mock_csv_headers(headers)
+      mock_csv = instance_double("CSV", headers:)
+      allow(CSV).to receive(:read).and_return(mock_csv)
+    end
+
+    it "raises an exception if columns are not in expected structure" do
+      mock_csv_headers([
+        "Timestampp", # deliberate typo
+      ])
+
+      expect { described_class.validate_responses(responses_csv:) }.to raise_exception(
+        InvalidStructureException,
+        "Expected 'Timestampp' to match '(?-mix:^Timestamp$)'",
+      )
+    end
+
+    it "returns true if columns are in expected structure" do
+      mock_csv_headers(valid_headers)
+
+      expect(described_class.validate_responses(responses_csv:)).to eq(true)
+    end
+
+    it "supports multiple 'Week commencing' columns" do
+      mock_csv_headers(valid_headers.insert(valid_headers.count - 1, [
+        "Week commencing 08/04/2024",
+        "Week commencing 15/04/2024",
+        "Week commencing 22/04/2024",
+        "Week commencing 29/04/2024",
+        "Week commencing 06/05/2024",
+        "Week commencing 13/05/2024",
+        "Week commencing 20/05/2024",
+        "Week commencing 27/05/2024",
+        "Week commencing 03/06/2024",
+        "Week commencing 10/06/2024",
+        "Week commencing 17/06/2024",
+        "Week commencing 24/06/2024",
+      ]).flatten)
+
+      expect(described_class.validate_responses(responses_csv:)).to eq(true)
+    end
+
+    it "raises an exception if the last column is missing" do
+      mock_csv_headers(valid_headers[0...-1])
+
+      expect { described_class.validate_responses(responses_csv:) }.to raise_exception(
+        InvalidStructureException,
+        "Expected 'Week commencing 01/04/2024' to match '(?-mix:^Need to elaborate on any of the above\\?)'",
+      )
+    end
+
+    it "raises an exception if the dates given aren't exactly 7 days apart" do
+      mock_csv_headers(valid_headers.insert(valid_headers.count - 1, [
+        "Week commencing 08/04/2024",
+        "Week commencing 16/04/2024", # should be 15th
+      ]).flatten)
+
+      expect { described_class.validate_responses(responses_csv:) }.to raise_exception(
+        InvalidStructureException,
+        "Expected 'Week commencing 16/04/2024' to be 'Week commencing 15/04/2024'",
+      )
+    end
+
+    it "raises an exception if the first date isn't a Monday" do
+      bad_headers = valid_headers
+      bad_headers[valid_headers.count - 2] = "Week commencing 02/04/2024"
+      mock_csv_headers(bad_headers)
+
+      expect { described_class.validate_responses(responses_csv:) }.to raise_exception(
+        InvalidStructureException,
+        "Expected column 'Week commencing 02/04/2024' to correspond to a Monday, but it's a Tuesday.",
+      )
+    end
+  end
 end
