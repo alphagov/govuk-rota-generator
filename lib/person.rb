@@ -62,4 +62,17 @@ class Person
 
     @assigned_shifts.delete(shift_to_unassign)
   end
+
+  def to_h
+    excluded_ivars = ["@random_factor", "@roles_config"]
+
+    hash = {}
+    instance_variables.each do |variable|
+      next if excluded_ivars.include? variable.to_s
+
+      value = instance_variable_get(variable)
+      hash[variable.to_s.delete("@")] = value
+    end
+    hash
+  end
 end
