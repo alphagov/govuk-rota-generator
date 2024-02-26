@@ -35,9 +35,9 @@ The 2nd-line-support Google group is an 'Owner' of the service account, so anyon
 
 ### Get the data ready
 
-1. Update the `AVAILABILITY_SHEET_ID` specified inside `combine_csvs.rb`, to refer to your responses spreadsheet.
+1. Update the `AVAILABILITY_SHEET_ID` specified inside `fetch_data.rb`, to refer to your responses spreadsheet.
 
-2. Run `ruby bin/combine_csvs.rb`. This will generate a `data/combined.csv` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
+2. Run `ruby bin/fetch_data.rb`. This will generate a `data/combined.csv` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
 
 The generated file will look something like:
 
