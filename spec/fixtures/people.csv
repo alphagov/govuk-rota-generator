@@ -1,0 +1,2 @@
+Email,Role,Team,Contractor Agency,Contractor?,Role allows doing in-hours?,Can do in-hours secondary?,Eligible for in-hours primary?,Role allows doing on-call?,Eligible for on-call primary?,Eligible for on-call secondary?,Exempt from on-call duties?,Should be scheduled for on-call?
+joe.bloggs@digital.cabinet-office.gov.uk,Developer,Platform,N/A,No,No,Yes,Yes,Yes,Yes,Yes,No,Yes
