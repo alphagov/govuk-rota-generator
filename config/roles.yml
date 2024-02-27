@@ -1,0 +1,12 @@
+inhours_primary:
+  value: 1.4
+inhours_secondary:
+  value: 1.1
+inhours_primary_standby:
+  value: 0.75
+inhours_secondary_standby:
+  value: 0.75
+oncall_primary:
+  value: 2.5
+oncall_secondary:
+  value: 2

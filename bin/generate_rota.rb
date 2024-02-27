@@ -1,28 +1,10 @@
+require "yaml"
 require_relative "../lib/rota_generator"
 require_relative "../lib/fairness_calculator"
 
 INPUT_CSV = File.dirname(__FILE__) + "/../data/combined.csv"
 WEEKS_TO_GENERATE = 13
-ROLES_CONFIG = {
-  inhours_primary: {
-    value: 1.4,
-  },
-  inhours_secondary: {
-    value: 1.1,
-  },
-  inhours_primary_standby: {
-    value: 0.75,
-  },
-  inhours_secondary_standby: {
-    value: 0.75,
-  },
-  oncall_primary: {
-    value: 2.5,
-  },
-  oncall_secondary: {
-    value: 2,
-  },
-}
+ROLES_CONFIG = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
 
 puts "We want to generate a rota of #{WEEKS_TO_GENERATE} weeks, with the following roles in each week: #{ROLES_CONFIG.keys.join(", ")}"
 slots_to_fill = WEEKS_TO_GENERATE * ROLES_CONFIG.keys.count

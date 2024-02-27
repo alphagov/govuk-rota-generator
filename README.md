@@ -50,6 +50,6 @@ Some Person,Find and View,false,false,false,false,false,true,true,"6,10"
 
 Run `ruby bin/generate_rota.rb` (it will output to STDOUT).
 
-Tweak the weighting in that file to place more or less emphasis on different cover types (e.g. oncall_primary).
+You can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml).
 
 The generated output can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty), which automates the overriding of PagerDuty schedules.
