@@ -57,7 +57,7 @@ ROLES_CONFIG = {
 }
 
 generator = RotaGenerator.new(dates:, people:, roles_config: ROLES_CONFIG)
-generator.fill_slots
+generator.fill_slots(group_weekly: true)
 
 puts "All shifts allocated. See CSV below:"
 puts ""

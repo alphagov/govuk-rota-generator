@@ -68,7 +68,6 @@ class RotaGenerator
       end
 
     else
-
       @dates.each do |date|
         puts "Filling date #{date}"
 
@@ -113,5 +112,23 @@ class RotaGenerator
         end
       end
     end
+  end
+
+  def to_csv
+    roles = @roles_config.keys
+    columns = %w[date] + roles
+    csv_lines = [columns]
+    @dates.each do |date|
+      row = columns.map do |column|
+        if column == "date"
+          date
+        else
+          person = @people.find { |person| person.assigned_shifts.include?({ date:, role: column }) }
+          person.nil? ? "" : person.name
+        end
+      end
+      csv_lines << row
+    end
+    csv_lines.map { |row| row.join(",") }.join("\n")
   end
 end

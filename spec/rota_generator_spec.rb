@@ -88,4 +88,31 @@ RSpec.describe RotaGenerator do
       ])
     end
   end
+
+  describe "#to_csv" do
+    it "outputs the rota as a CSV" do
+      generator = described_class.new(dates:, people:, roles_config:)
+      generator.fill_slots(group_weekly: true)
+
+      expect(generator.to_csv).to eq(
+        <<~CSV.chomp,
+          date,inhours_primary
+          01/04/2024,A
+          02/04/2024,A
+          03/04/2024,A
+          04/04/2024,A
+          05/04/2024,A
+          06/04/2024,
+          07/04/2024,
+          08/04/2024,B
+          09/04/2024,B
+          10/04/2024,B
+          11/04/2024,B
+          12/04/2024,B
+          13/04/2024,
+          14/04/2024,
+        CSV
+      )
+    end
+  end
 end
