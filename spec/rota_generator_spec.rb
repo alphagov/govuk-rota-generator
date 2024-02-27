@@ -114,5 +114,18 @@ RSpec.describe RotaGenerator do
         CSV
       )
     end
+
+    it "condeses the rota by weekly if passed `group_weekly`" do
+      generator = described_class.new(dates:, people:, roles_config:)
+      generator.fill_slots(group_weekly: true)
+
+      expect(generator.to_csv(group_weekly: true)).to eq(
+        <<~CSV.chomp,
+          week,inhours_primary
+          01/04/2024-07/04/2024,A
+          08/04/2024-14/04/2024,B
+        CSV
+      )
+    end
   end
 end

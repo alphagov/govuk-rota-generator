@@ -114,21 +114,44 @@ class RotaGenerator
     end
   end
 
-  def to_csv
+  def to_csv(group_weekly: false)
     roles = @roles_config.keys
-    columns = %w[date] + roles
-    csv_lines = [columns]
-    @dates.each do |date|
-      row = columns.map do |column|
-        if column == "date"
-          date
-        else
-          person = @people.find { |person| person.assigned_shifts.include?({ date:, role: column }) }
-          person.nil? ? "" : person.name
+    csv_lines = []
+
+    if group_weekly
+      weeks = @dates.each_slice(7).to_a
+      columns = %w[week] + roles
+      csv_lines = [columns]
+      weeks.each do |dates_for_week|
+        row = columns.map do |column|
+          if column == "week"
+            "#{dates_for_week.first}-#{dates_for_week.last}"
+          else
+            people_covering_role_this_week = dates_for_week.map do |date|
+              @people.find { |person| person.assigned_shifts.include?({ date:, role: column }) }
+            end
+            people_covering_role_this_week.compact
+            people_covering_role_this_week.first.name # todo
+          end
         end
+        csv_lines << row
       end
-      csv_lines << row
+    else
+      columns = %w[date] + roles
+      csv_lines = [columns]
+      @dates.each do |date|
+        row = columns.map do |column|
+          if column == "date"
+            date
+          else
+            person = @people.find { |person| person.assigned_shifts.include?({ date:, role: column }) }
+            person.nil? ? "" : person.name
+          end
+        end
+        csv_lines << row
+      end
     end
+
     csv_lines.map { |row| row.join(",") }.join("\n")
   end
 end
