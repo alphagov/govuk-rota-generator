@@ -60,6 +60,8 @@ class Person
     end
 
     @assigned_shifts << { date:, role: }
+
+    @assigned_shifts.sort! { |a,b| Date.parse(a[:date]) <=> Date.parse(b[:date]) }
   end
 
   def unassign(role:, date:)
