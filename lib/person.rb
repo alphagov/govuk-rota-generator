@@ -54,6 +54,8 @@ class Person
     raise ForbiddenDateException unless availability(date:).include?(role)
 
     @assigned_shifts << { date:, role: }
+
+    @assigned_shifts.sort! { |a, b| Date.parse(a[:date]) <=> Date.parse(b[:date]) }
   end
 
   def unassign(role:, date:)
