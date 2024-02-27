@@ -1,5 +1,4 @@
 require "csv"
-require_relative "../lib/csv_validator"
 require_relative "../lib/data_processor"
 require_relative "../lib/google_sheet"
 
@@ -13,7 +12,7 @@ puts "Fetching developer availability..."
 responses = GoogleSheet.new.fetch(sheet_id: AVAILABILITY_SHEET_ID, filepath: RESPONSES_CSV)
 puts "...downloaded to #{RESPONSES_CSV}"
 puts "Validating data..."
-CsvValidator.validate_columns(responses)
+DataProcessor.validate_responses(responses_csv: RESPONSES_CSV)
 puts "...validated."
 
 puts "Fetching 'Technical support' sheet..."
