@@ -139,9 +139,9 @@ RSpec.describe Person do
       expect(person.assigned_shifts).to eq([])
     end
 
-    it "returns an array of all shifts that have been assigned" do
-      person.assign(role: :inhours_primary, date: "08/04/2024")
+    it "returns an array of all shifts that have been assigned, in date order" do
       person.assign(role: :inhours_primary, date: "09/04/2024")
+      person.assign(role: :inhours_primary, date: "08/04/2024")
       expect(person.assigned_shifts).to eq([
         {
           date: "08/04/2024",
