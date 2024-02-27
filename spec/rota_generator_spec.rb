@@ -49,6 +49,24 @@ RSpec.describe RotaGenerator do
     ])
   end
 
+  it "groups the shifts on a weekly basis if configured to" do
+    described_class.new(dates:, people:, roles_config:).fill_slots(group_weekly: true)
+    expect(person_a.assigned_shifts).to eq([
+      { date: "01/04/2024", role: :inhours_primary },
+      { date: "02/04/2024", role: :inhours_primary },
+      { date: "03/04/2024", role: :inhours_primary },
+      { date: "04/04/2024", role: :inhours_primary },
+      { date: "05/04/2024", role: :inhours_primary },
+    ])
+    expect(person_b.assigned_shifts).to eq([
+      { date: "08/04/2024", role: :inhours_primary },
+      { date: "09/04/2024", role: :inhours_primary },
+      { date: "10/04/2024", role: :inhours_primary },
+      { date: "11/04/2024", role: :inhours_primary },
+      { date: "12/04/2024", role: :inhours_primary },
+    ])
+  end
+
   # let(:fixture_path) { "#{File.dirname(__FILE__)}/fixtures/" }
   # let(:roles_config) do
   #   {

@@ -5,9 +5,90 @@ class RotaGenerator
     @roles_config = roles_config
   end
 
-  def fill_slots
+  def fill_slots(group_weekly: false)
     people_queue = @people
     puts "People: #{@people.inspect}"
+
+    if group_weekly
+      # TODO - batch-assign entire week
+      # THEN check availability afterwards and swap out folks later
+      weeks = @dates.each_slice(7).to_a
+
+      weeks.each do |dates_for_week|
+        roles_to_fill = @roles_config.keys
+        puts "filling #{roles_to_fill} for dates #{dates_for_week}"
+        roles_to_fill.each do |role|
+          # find first person in queue who can do this role
+          person = people_queue.find { |person| person.can_do_role?(role) }
+
+          if person.nil?
+            puts "NOBODY ABLE TO FILL #{role} on #{dates_for_week}"
+          else
+            # find dates for this role to be assigned
+            puts "finding dates for this role..."
+            dates_for_role = dates_for_week.select do |date|
+              day_of_week = Date.parse(date).strftime("%A")
+              !(%i[
+                inhours_primary
+                inhours_primary_standby
+                inhours_secondary
+                inhours_secondary_standby
+              ].include?(role) && %w[Saturday Sunday].include?(day_of_week))
+            end
+
+            # assign person to shifts
+            dates_for_role.each do |date|
+              person.assign(role:, date:)
+            end
+            # put person at back of queue
+            people_queue.delete(person)
+            people_queue << person
+          end
+        end
+
+      #   @people
+
+      #   day_of_week = Date.parse(date).strftime("%A")
+      #   if %w[Saturday Sunday].include?(day_of_week)
+      #     roles_to_fill -= %i[
+      #       inhours_primary
+      #       inhours_primary_standby
+      #       inhours_secondary
+      #       inhours_secondary_standby
+      #     ]
+      #   else
+      #     roles_to_fill -= %i[
+      #       oncall_primary
+      #       oncall_secondary
+      #     ]
+      #   end
+
+      #   if roles_to_fill.empty?
+      #     puts "no roles to fill"
+      #   end
+
+      #   roles_to_fill.each do |role|
+      #     puts "Filling role #{role}"
+      #     counter = 1
+      #     candidate = people_queue.first
+      #     puts "initial candidate #{candidate.email}"
+      #     while(!candidate.can_do_role?(role) && counter < people_queue.count) # TODO use availability
+      #       puts "can't do role - rotating candidate"
+      #       people_queue.rotate!(1)
+      #       candidate = people_queue.first
+      #       counter += 1
+      #     end
+      #     puts "final candidate #{candidate.email}"
+      #     if counter == people_queue.count
+      #       puts "NOBODY ABLE TO FILL #{role} on #{date}"
+      #     else
+      #       candidate.assign(role:, date:)
+      #       people_queue.rotate!(1)
+      #     end
+      #   end
+      end
+
+    else
 
     @dates.each do |date|
       puts "Filling date #{date}"
@@ -37,7 +118,7 @@ class RotaGenerator
         counter = 1
         candidate = people_queue.first
         puts "initial candidate #{candidate.email}"
-        while(!candidate.can_do_role?(role) && counter < people_queue.count)
+        while(!candidate.can_do_role?(role) && counter < people_queue.count) # TODO use availability
           puts "can't do role - rotating candidate"
           people_queue.rotate!(1)
           candidate = people_queue.first
@@ -52,6 +133,7 @@ class RotaGenerator
         end
       end
     end
+  end
 
 
     # dates = slots_to_fill.map { |slot| slot[:date] }.uniq.sort
