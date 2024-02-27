@@ -30,7 +30,9 @@ class Person
 
   def availability(date:)
     available_roles = @can_do_roles
-    if @forbidden_in_hours_days.include?(date)
+    day_of_week = Date.parse(date).strftime("%A")
+
+    if @forbidden_in_hours_days.include?(date) || non_working_days.include?(day_of_week)
       available_roles -= %i[
         inhours_primary
         inhours_secondary

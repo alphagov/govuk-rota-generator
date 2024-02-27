@@ -88,6 +88,13 @@ RSpec.describe Person do
     it "returns an empty array if both in-hours and on-call are 'forbidden'" do
       expect(person.availability(date: "01/04/2024")).to eq([])
     end
+
+    it "marks non-working days as unavailable for in-hours" do
+      an_otherwise_available_friday = "12/04/2024" # non-working day, but not explicitly a 'forbidden in hours or on-call'
+      expect(person.availability(date: an_otherwise_available_friday)).to eq(%i[
+        oncall_primary
+      ])
+    end
   end
 
   describe "#assign" do
