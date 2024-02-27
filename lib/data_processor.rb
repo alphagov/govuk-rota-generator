@@ -25,20 +25,24 @@ class DataProcessor
 
   def self.create_people_from_csv_data(people_data, responses_data)
     people_data.map do |person_data|
-      response_data = responses_data.find { |response| person_data["Email"] == response["Email address"] }
-      week_commencing_fields = responses_data.headers
-        .select { |header| header.match(/^Week commencing/) && response_data[header] }
-        .map do |week_commencing_field|
-          {
-            date: week_commencing_field.match(/^Week commencing (.+)$/)[1],
-            availability: response_data[week_commencing_field].split(",").map(&:strip),
-          }
-        end
+      email = person_data["Email"]
+      response_data = responses_data.find { |response| email == response["Email address"] }
+      week_commencing_fields = []
+      unless response_data.nil?
+        week_commencing_fields = responses_data.headers
+          .select { |header| header.match(/^Week commencing/) && response_data[header] }
+          .map do |week_commencing_field|
+            {
+              date: week_commencing_field.match(/^Week commencing (.+)$/)[1],
+              availability: response_data[week_commencing_field].split(",").map(&:strip),
+            }
+          end
+      end
 
       person_args = {
-        email: response_data["Email address"],
-        team: response_data["What team/area are you in (or will be in when this rota starts)?"],
-        non_working_days: non_working_days(response_data["Do you have any non working days? [Non working day(s)]"]),
+        email:,
+        team: response_data ? response_data["What team/area are you in (or will be in when this rota starts)?"] : "Unknown",
+        non_working_days: response_data ? non_working_days(response_data["Do you have any non working days? [Non working day(s)]"]) : [],
         forbidden_in_hours_days: week_commencing_fields.map { |field|
           weekdays(field[:date]) if field[:availability].include?("Not available for in-hours")
         }.compact.flatten,
