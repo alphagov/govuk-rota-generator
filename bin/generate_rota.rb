@@ -61,7 +61,7 @@ generator.fill_slots(group_weekly: true)
 
 puts "All shifts allocated. See CSV below:"
 puts ""
-puts generator.to_csv
+puts generator.to_csv(group_weekly: true)
 puts ""
 # puts "Checking fairness of spread:"
 # fairness_calculator = FairnessCalculator.new(ROLES_CONFIG)

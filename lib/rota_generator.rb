@@ -132,7 +132,12 @@ class RotaGenerator
               person.nil? ? nil : { name: person.name, date: }
             end
 
-            grouped = people_covering_role_this_week.compact!.group_by { |shift| shift[:name] }
+            people_covering_role_this_week.compact!
+            if people_covering_role_this_week.nil?
+              raise "No people covering #{column} for dates #{dates_for_week}"
+            end
+
+            grouped = people_covering_role_this_week.group_by { |shift| shift[:name] }
             name_of_person_with_most_shifts = grouped.keys.first
             if grouped.count  == 1
               name_of_person_with_most_shifts
@@ -140,7 +145,7 @@ class RotaGenerator
               # need to find the person with the most shifts, and then specify the remainder as overrides
               remainders = people_covering_role_this_week.reject { |shift| shift[:name] == name_of_person_with_most_shifts }
               remainder_strings = remainders.map { |remainder| "#{remainder[:name]} on #{remainder[:date]}" }
-              "#{name_of_person_with_most_shifts} (#{remainder_strings.join(',')})"
+              "#{name_of_person_with_most_shifts} (#{remainder_strings.join(', ')})"
             end
           end
         end
