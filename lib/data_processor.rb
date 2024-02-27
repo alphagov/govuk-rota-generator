@@ -66,11 +66,11 @@ class DataProcessor
       response_data = responses_data.find { |response| person_data["Email"] == response["Email address"] }
       week_commencing_fields = responses_data.headers.select { |header| header.match(/^Week commencing/) }
 
-      email = response_data["Email address"]
-      team = response_data["What team/area are you in (or will be in when this rota starts)?"]
-      non_working_days = non_working_days(response_data)
-      forbidden_in_hours_days = forbidden_in_hours_days(week_commencing_fields, response_data)
-      forbidden_on_call_days = forbidden_on_call_days(week_commencing_fields, response_data)
+      email = person_data["Email"]
+      team = response_data.nil? ? "Unknown" : response_data["What team/area are you in (or will be in when this rota starts)?"]
+      non_working_days = response_data.nil? ? [] : non_working_days(response_data)
+      forbidden_in_hours_days = response_data.nil? ? [] : forbidden_in_hours_days(week_commencing_fields, response_data)
+      forbidden_on_call_days = response_data.nil? ? [] : forbidden_on_call_days(week_commencing_fields, response_data)
       can_do_roles = [
         person_data["Eligible for in-hours primary?"] == "Yes" ? :inhours_primary : nil,
         person_data["Can do in-hours secondary?"] == "Yes" ? :inhours_secondary : nil,
