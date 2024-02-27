@@ -115,7 +115,7 @@ RSpec.describe RotaGenerator do
       )
     end
 
-    it "condeses the rota by weekly if passed `group_weekly`" do
+    it "condenses the rota by weekly if passed `group_weekly`" do
       generator = described_class.new(dates:, people:, roles_config:)
       generator.fill_slots(group_weekly: true)
 
@@ -123,6 +123,22 @@ RSpec.describe RotaGenerator do
         <<~CSV.chomp,
           week,inhours_primary
           01/04/2024-07/04/2024,A
+          08/04/2024-14/04/2024,B
+        CSV
+      )
+    end
+
+    it "condenses the rota by weekly if passed `group_weekly`, specifying overrides where appropriate" do
+      person_a = Person.new(email: "a@a.com", team: "Foo", can_do_roles: %i[inhours_primary], non_working_days: %w[Friday])
+      person_b = Person.new(email: "b@b.com", team: "Bar", can_do_roles: %i[inhours_primary])
+
+      generator = described_class.new(dates:, people: [person_a, person_b], roles_config:)
+      generator.fill_slots(group_weekly: true)
+
+      expect(generator.to_csv(group_weekly: true)).to eq(
+        <<~CSV.chomp,
+          week,inhours_primary
+          01/04/2024-07/04/2024,A (B on 05/04/2024)
           08/04/2024-14/04/2024,B
         CSV
       )

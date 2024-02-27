@@ -128,10 +128,20 @@ class RotaGenerator
             "#{dates_for_week.first}-#{dates_for_week.last}"
           else
             people_covering_role_this_week = dates_for_week.map do |date|
-              @people.find { |person| person.assigned_shifts.include?({ date:, role: column }) }
+              person = @people.find { |person| person.assigned_shifts.include?({ date:, role: column }) }
+              person.nil? ? nil : { name: person.name, date: }
             end
-            people_covering_role_this_week.compact
-            people_covering_role_this_week.first.name # todo
+
+            grouped = people_covering_role_this_week.compact!.group_by { |shift| shift[:name] }
+            name_of_person_with_most_shifts = grouped.keys.first
+            if grouped.count  == 1
+              name_of_person_with_most_shifts
+            else
+              # need to find the person with the most shifts, and then specify the remainder as overrides
+              remainders = people_covering_role_this_week.reject { |shift| shift[:name] == name_of_person_with_most_shifts }
+              remainder_strings = remainders.map { |remainder| "#{remainder[:name]} on #{remainder[:date]}" }
+              "#{name_of_person_with_most_shifts} (#{remainder_strings.join(',')})"
+            end
           end
         end
         csv_lines << row
