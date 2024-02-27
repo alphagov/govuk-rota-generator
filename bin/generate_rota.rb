@@ -18,6 +18,7 @@ people_array = YAML.load_file(File.dirname(__FILE__) + "/../data/combined.yml", 
 people = people_array.map { |person_data| Person.new(**person_data) }
 
 ROLES_CONFIG = {
+  # TODO: `weekends`, `weekdays`, `weeknights` booleans
   inhours_primary: {
     value: 1.4,
     weekdays: true,

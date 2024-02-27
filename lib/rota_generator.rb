@@ -1,4 +1,4 @@
-class RotaGenerator
+class RotaGenerator # TODO: take 'algorithm' arg, for daily vs weekly
   def initialize(dates:, people:, roles_config:)
     @dates = dates
     @people = people
