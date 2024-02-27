@@ -14,6 +14,7 @@ class RotaGenerator
       # THEN check availability afterwards and swap out folks later
       weeks = @dates.each_slice(7).to_a
 
+      stray_shifts= []
       weeks.each do |dates_for_week|
         roles_to_fill = @roles_config.keys
         puts "filling #{roles_to_fill} for dates #{dates_for_week}"
@@ -38,13 +39,33 @@ class RotaGenerator
 
             # assign person to shifts
             dates_for_role.each do |date|
-              person.assign(role:, date:)
+              begin
+                person.assign(role:, date:)
+              rescue ForbiddenDateException
+                stray_shifts << { role:, date: }
+              end
             end
             # put person at back of queue
             people_queue.delete(person)
             people_queue << person
           end
         end
+      end
+
+      stray_shifts.each do |shift|
+        date = shift[:date]
+        role = shift[:role]
+        person = people_queue.find { |person| person.availability(date:).include?(role) }
+        if person.nil?
+          puts "NOBODY ABLE TO FILL #{role} on #{date}"
+        else
+          # assign person to shift
+          person.assign(role:, date:)
+          # put person at back of queue
+          people_queue.delete(person)
+          people_queue << person
+        end
+      end
 
       #   @people
 
@@ -86,7 +107,6 @@ class RotaGenerator
       #       people_queue.rotate!(1)
       #     end
       #   end
-      end
 
     else
 
