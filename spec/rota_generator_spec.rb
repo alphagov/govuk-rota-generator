@@ -72,21 +72,39 @@ RSpec.describe RotaGenerator do
     roles_config = {
       inhours_primary: {
         value: 1.4,
+        weekdays: true,
+        weeknights: false,
+        weekends: false,
       },
       inhours_secondary: {
         value: 1.1,
+        weekdays: true,
+        weeknights: false,
+        weekends: false,
       },
       inhours_primary_standby: {
         value: 0.75,
+        weekdays: true,
+        weeknights: false,
+        weekends: false,
       },
       inhours_secondary_standby: {
         value: 0.75,
+        weekdays: true,
+        weeknights: false,
+        weekends: false,
       },
       oncall_primary: {
         value: 2.5,
+        weekdays: false,
+        weeknights: true,
+        weekends: true,
       },
       oncall_secondary: {
         value: 2,
+        weekdays: false,
+        weeknights: true,
+        weekends: true,
       },
     }
 
