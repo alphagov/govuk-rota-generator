@@ -9,14 +9,14 @@ class ShiftNotAssignedException < StandardError; end
 class Person
   attr_reader :email, :team, :non_working_days, :assigned_shifts
 
-  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [])
+  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [], assigned_shifts: [])
     @email = email
     @team = team
     @non_working_days = non_working_days
     @can_do_roles = can_do_roles
     @forbidden_in_hours_days = forbidden_in_hours_days
     @forbidden_on_call_days = forbidden_on_call_days
-    @assigned_shifts = []
+    @assigned_shifts = assigned_shifts
     @roles_config = Roles.new
   end
 
@@ -61,5 +61,22 @@ class Person
     raise ShiftNotAssignedException if shift_to_unassign.nil?
 
     @assigned_shifts.delete(shift_to_unassign)
+  end
+
+  def to_h
+    excluded_ivars = ["@roles_config"]
+
+    hash = {}
+    instance_variables.each do |variable|
+      next if excluded_ivars.include? variable.to_s
+
+      value = instance_variable_get(variable)
+      if value.is_a?(Array) && value.first.is_a?(Hash)
+        value = value.map { |element| element.transform_keys(&:to_s) }
+      end
+
+      hash[variable.to_s.delete("@")] = value
+    end
+    hash
   end
 end

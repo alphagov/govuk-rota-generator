@@ -175,4 +175,13 @@ RSpec.describe Person do
       ])
     end
   end
+
+  describe "#to_h" do
+    it "returns all the metadata about the person needed to generate a rota" do
+      expected_hash = person_configuration
+      expected_hash[:non_working_days] = %w[Friday]
+      expected_hash[:assigned_shifts] = []
+      expect(person.to_h.transform_keys(&:to_sym)).to eq(expected_hash)
+    end
+  end
 end
