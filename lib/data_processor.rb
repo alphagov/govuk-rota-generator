@@ -1,9 +1,23 @@
+require "csv"
 require "date"
+require "yaml"
 require_relative "./person"
 
 class InvalidStructureException < StandardError; end
 
 class DataProcessor
+  def self.combine(responses_csv:, people_csv:, filepath:)
+    people_data = CSV.read(people_csv, headers: true)
+    responses_data = CSV.read(responses_csv, headers: true)
+    people = combine_raw(people_data, responses_data)
+    output = {
+      "dates" => dates(responses_data.headers.select { |header| header.match(/^Week commencing/) }),
+      "people" => people.map(&:to_h),
+    }
+
+    File.write(filepath, output.to_yaml)
+  end
+
   def self.combine_raw(people_data, responses_data)
     people = []
     people_data.each do |person_data|
@@ -44,6 +58,18 @@ class DataProcessor
 
       Date.parse(abbreviated_day).strftime("%A")
     }.compact
+  end
+
+  def self.dates(week_commencing_fields)
+    first_date = week_commencing_fields.first.match(/^Week commencing (.+)$/)[1]
+    last_date = (Date.parse(week_commencing_fields.last.match(/^Week commencing (.+)$/)[1]) + 6).strftime("%d/%m/%Y")
+    dates = [first_date]
+    tmp = first_date
+    while tmp != last_date
+      tmp = (Date.parse(tmp) + 1).strftime("%d/%m/%Y")
+      dates << tmp
+    end
+    dates
   end
 
   def self.forbidden_in_hours_days(week_commencing_fields, response)

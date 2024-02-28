@@ -2,6 +2,19 @@ require "csv"
 require "data_processor"
 
 RSpec.describe DataProcessor do
+  describe ".combine" do
+    it "combines two CSV files into one YML file" do
+      responses_csv = "#{File.dirname(__FILE__)}/fixtures/responses.csv"
+      people_csv = "#{File.dirname(__FILE__)}/fixtures/people.csv"
+
+      filepath = "#{File.dirname(__FILE__)}/tmp/local.yml"
+      File.delete(filepath) if File.exist? filepath
+
+      described_class.combine(responses_csv:, people_csv:, filepath:)
+      expect(File.read(filepath)).to eq(File.read("#{File.dirname(__FILE__)}/fixtures/rota_inputs.yml"))
+    end
+  end
+
   describe ".combine_raw" do
     it "combines two CSV parsed inputs into one array of Person" do
       people_data = CSV.parse(<<~CSV, headers: true)
