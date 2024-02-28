@@ -112,4 +112,22 @@ RSpec.describe RotaGenerator do
       ])
     end
   end
+
+  describe "#write_rota" do
+    it "writes data to a YML file" do
+      filepath = "#{File.dirname(__FILE__)}/tmp/local.yml"
+      File.delete(filepath) if File.exist? filepath
+
+      generator = described_class.new(dates:, people:, roles_config:)
+      generator.fill_slots
+      generator.write_rota(filepath:)
+      written_yaml = YAML.load_file(filepath, symbolize_names: true)
+
+      expect(written_yaml).to match(
+        dates:,
+        roles: roles_config,
+        people: instance_of(Array),
+      )
+    end
+  end
 end

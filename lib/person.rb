@@ -75,6 +75,10 @@ class Person
       next if excluded_ivars.include? variable.to_s
 
       value = instance_variable_get(variable)
+      if value.is_a?(Array) && value.first.is_a?(Hash)
+        value = value.map { |element| element.transform_keys(&:to_s) }
+      end
+
       hash[variable.to_s.delete("@")] = value
     end
     hash

@@ -1,3 +1,5 @@
+require "yaml"
+
 class RotaGenerator
   def initialize(dates:, people:, roles_config:)
     @dates = dates
@@ -29,5 +31,20 @@ class RotaGenerator
         people_queue.sort_by! { |person| @roles_config.value_of_shifts(person.assigned_shifts) }
       end
     end
+  end
+
+  def write_rota(filepath:)
+    roles = {}
+    @roles_config.config.each do |key, value|
+      roles[key.to_s] = value.transform_keys(&:to_s)
+    end
+
+    output = {
+      dates: @dates,
+      roles:,
+      people: @people.map(&:to_h),
+    }.transform_keys(&:to_s)
+
+    File.write(filepath, output.to_yaml)
   end
 end
