@@ -1,7 +1,8 @@
-require "generate_rota"
+require "yaml"
+require "rota_generator"
 require "person"
 
-RSpec.describe GenerateRota do
+RSpec.describe RotaGenerator do
   let(:fixture_path) { "#{File.dirname(__FILE__)}/fixtures/" }
   let(:roles_config) do
     {
@@ -69,26 +70,7 @@ RSpec.describe GenerateRota do
     # Chosen seed is arbitrary, needed to ensure tests for random factor in sort are stable
     Randomiser.instance.set_seed(5959)
     rota_generator = described_class.new(csv: "#{fixture_path}/availability.csv")
-    roles_config = {
-      inhours_primary: {
-        value: 1.4,
-      },
-      inhours_secondary: {
-        value: 1.1,
-      },
-      inhours_primary_standby: {
-        value: 0.75,
-      },
-      inhours_secondary_standby: {
-        value: 0.75,
-      },
-      oncall_primary: {
-        value: 2.5,
-      },
-      oncall_secondary: {
-        value: 2,
-      },
-    }
+    roles_config = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
 
     rota_generator.fill_slots(
       rota_generator.people,

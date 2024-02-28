@@ -31,13 +31,15 @@ The 2nd-line-support Google group is an 'Owner' of the service account, so anyon
 2. Update the dates etc, but otherwise make no changes to the form structure
 3. Send out the form, gather responses
 4. Link it to a spreadsheet
-5. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com` (dismiss the warning about sharing with external email addresses)
+5. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`, as a Viewer. (Dismiss the warning about sharing with external email addresses)
 
 ### Get the data ready
 
-1. Update the `AVAILABILITY_SHEET_ID` specified inside `combine_csvs.rb`, to refer to your responses spreadsheet.
+Run the `fetch_data` script, passing the URL of your responses spreadsheet as a parameter, e.g.
 
-2. Run `ruby bin/combine_csvs.rb`. This will generate a `data/combined.csv` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
+`ruby bin/fetch_data.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`
+
+This will generate a `data/combined.csv` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
 
 The generated file will look something like:
 
@@ -50,6 +52,6 @@ Some Person,Find and View,false,false,false,false,false,true,true,"6,10"
 
 Run `ruby bin/generate_rota.rb` (it will output to STDOUT).
 
-Tweak the weighting in that file to place more or less emphasis on different cover types (e.g. oncall_primary).
+You can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml).
 
 The generated output can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty), which automates the overriding of PagerDuty schedules.

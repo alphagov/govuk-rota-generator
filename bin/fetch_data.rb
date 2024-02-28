@@ -2,7 +2,7 @@ require "csv"
 require_relative "../lib/google_sheet"
 require_relative "../lib/csv_validator"
 
-AVAILABILITY_SHEET_ID = "1YV0e18wP0g3RsG146osvJLostYZgL9XS2jDGLQEgm2Q"
+AVAILABILITY_SHEET_ID = ARGV.first.match(/spreadsheets\/d\/([^\/]+)/)[1]
 TECHNICAL_SUPPORT_SHEET_ID = "1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU"
 RESPONSES_CSV = File.dirname(__FILE__) + "/../data/responses.csv"
 PEOPLE_CSV = File.dirname(__FILE__) + "/../data/people.csv"
