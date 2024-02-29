@@ -1,6 +1,5 @@
 require "csv"
 require "date"
-require "yaml"
 require_relative "./person"
 
 class InvalidStructureException < StandardError; end
@@ -16,13 +15,7 @@ class DataProcessor
       .map { |header| header.match(/^Week commencing (.+)$/)[1] }
     last_date = format_date(Date.parse(week_commencing_dates.last) + 6)
 
-    File.write(
-      filepath,
-      {
-        "dates" => date_range(week_commencing_dates.first, last_date),
-        "people" => people.map(&:to_h),
-      }.to_yaml,
-    )
+    File.write(filepath, RotaPresenter.new(people:, dates: date_range(week_commencing_dates.first, last_date)).to_yaml)
   end
 
   def self.create_people_from_csv_data(people_data, responses_data)
