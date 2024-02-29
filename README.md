@@ -39,13 +39,34 @@ Run the `fetch_data` script, passing the URL of your responses spreadsheet as a 
 
 `ruby bin/fetch_data.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`
 
-This will generate a `data/combined.csv` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
+This will generate a `data/rota_inputs.yml` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
 
 The generated file will look something like:
 
-```csv
-name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
-Some Person,Find and View,false,false,false,false,false,true,true,"6,10"
+```yml
+---
+dates:
+- 01/04/2024
+- 02/04/2024
+- 03/04/2024
+- 04/04/2024
+- 05/04/2024
+- 06/04/2024
+- 07/04/2024
+people:
+- email: dev.eloper@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary
+  - :inhours_secondary
+  - :inhours_primary_standby
+  - :inhours_secondary_standby
+  - :oncall_primary
+  - :oncall_secondary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts: []
 ```
 
 ### Generate the rota
