@@ -50,4 +50,21 @@ RSpec.describe RotaPresenter do
       end
     end
   end
+
+  describe "#fairness_summary" do
+    it "describes the fairness of the generated rota" do
+      fixture_data = YAML.load_file(filepath, symbolize_names: true)
+      people = fixture_data[:people].map { |person_data| Person.new(**person_data) }
+      roles_config = Roles.new(config: fixture_data[:roles])
+
+      expect(described_class.fairness_summary(people:, roles_config:)).to eq(
+        <<~OUTPUT.chomp,
+          A has 5 units of inconvenience, made up of 5 shifts including 5 inhours_primary.
+            (They're available for [:inhours_primary])
+          B has 5 units of inconvenience, made up of 5 shifts including 5 inhours_primary.
+            (They're available for [:inhours_primary])
+        OUTPUT
+      )
+    end
+  end
 end

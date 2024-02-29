@@ -30,8 +30,6 @@ class RotaGenerator
                       end
 
       roles_to_fill.each do |role|
-        # require "byebug"
-        # byebug if date == "05/04/2024"
         available_candidates = people_queue.select { |person| person.availability(date:).include?(role) }
         if available_candidates.empty?
           puts "NOBODY ABLE TO FILL #{role} on #{date}"

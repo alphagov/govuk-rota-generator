@@ -1,3 +1,6 @@
+require_relative "./person"
+require_relative "./roles"
+
 class RotaPresenter
   def initialize(filepath:)
     rota = YAML.load_file(filepath, symbolize_names: true)
@@ -73,5 +76,27 @@ class RotaPresenter
     end
 
     csv_lines.map { |row| row.join(",") }.join("\n")
+  end
+
+  def self.fairness_summary(people:, roles_config:)
+    sorted_people = people.sort_by { |person| - roles_config.value_of_shifts(person.assigned_shifts) }
+    people_summaries = sorted_people.map do |person|
+      shifts = person
+        .assigned_shifts
+        .group_by { |shift| shift[:role] }
+        .map { |role, grouped_shifts| "#{grouped_shifts.count} #{role}" }
+        .join(", ")
+
+      if person.assigned_shifts.count.zero?
+        "#{person.name} was not assigned to any shifts. " \
+        "They're eligible for #{person.can_do_roles == [] ? 'no roles' : person.can_do_roles}."
+      else
+        "#{person.name} has #{roles_config.value_of_shifts(person.assigned_shifts)} " \
+        "units of inconvenience, made up of #{person.assigned_shifts.count} shifts " \
+        "including #{shifts}.\n" \
+        "  (They're available for #{person.can_do_roles})"
+      end
+    end
+    people_summaries.join("\n")
   end
 end

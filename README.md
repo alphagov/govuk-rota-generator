@@ -78,3 +78,9 @@ This generates a `data/generated_rota.yml` file, which has the same structure as
 But the script will also output a user-friendly CSV to the "Auto-generated draft rota" worksheet you set up earlier, or to STDOUT if you don't provide the Google Sheet CLI parameter. The worksheet/CSV can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty) (automating the overriding of PagerDuty schedules).
 
 Note that you can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml), to influence how often folks are assigned to particular roles.
+
+### Check the fairness of the rota
+
+Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`.
+
+This summarises the fairness of the rota at the "Auto-generated draft rota" worksheet you set up earlier.
