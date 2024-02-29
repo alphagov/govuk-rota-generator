@@ -13,3 +13,10 @@ generator.fill_slots
 
 rota_output_file = "#{File.dirname(__FILE__)}/../data/generated_rota.yml"
 generator.write_rota(filepath: rota_output_file)
+
+presenter = RotaPresenter.new(filepath: rota_output_file)
+
+puts "All shifts allocated. See CSV below:"
+puts ""
+puts presenter.to_csv
+puts ""

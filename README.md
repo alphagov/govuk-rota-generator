@@ -71,8 +71,9 @@ people:
 
 ### Generate the rota
 
-Run `ruby bin/generate_rota.rb` (it will output to STDOUT).
+Run `ruby bin/generate_rota.rb`.
 
-You can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml).
+This generates a `data/generated_rota.yml` file, which has the same structure as the `data/rota_inputs.yml` file.
+But the script will also output a user-friendly CSV to STDOUT, which can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty) (automating the overriding of PagerDuty schedules) as well as be imported to a 2nd line rota spreadsheet.
 
-The generated output can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty), which automates the overriding of PagerDuty schedules.
+Note that you can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml), to influence how often folks are assigned to particular roles.
