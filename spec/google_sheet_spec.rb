@@ -7,14 +7,14 @@ RSpec.describe GoogleSheet do
     allow(File).to receive(:open).with("./google_service_account_key.json").and_return("{}")
   end
 
-  describe "#fetch" do
-    let(:sheet_id) { "1sK8ktAnffewnfiewnfoewifnwoein" }
-    let(:mock_sheets_api) do
-      mock_sheets_api = instance_double("Google::Apis::SheetsV4::SheetsService")
-      allow(mock_sheets_api).to receive(:authorization=)
-      mock_sheets_api
-    end
+  let(:sheet_id) { "1sK8ktAnffewnfiewnfoewifnwoein" }
+  let(:mock_sheets_api) do
+    mock_sheets_api = instance_double("Google::Apis::SheetsV4::SheetsService")
+    allow(mock_sheets_api).to receive(:authorization=)
+    mock_sheets_api
+  end
 
+  describe "#fetch" do
     it "returns data if sheet is found" do
       range = "SomeWorksheet!A1:Z"
       mock_response = instance_double("Google::Apis::SheetsV4::ValueRange", values: %w[foo])
@@ -52,6 +52,24 @@ RSpec.describe GoogleSheet do
           baz,bash
         CSV
       )
+    end
+  end
+
+  describe "#write" do
+    let(:range) { "SomeWorksheet!A1:Z" }
+
+    it "clears the sheet before writing values" do
+      expect(mock_sheets_api).to receive(:batch_clear_values).once.ordered
+      expect(mock_sheets_api).to receive(:batch_update_values).once.ordered
+
+      described_class.new(sheets_api: mock_sheets_api).write(sheet_id:, range:, csv: "foo,bar,baz")
+    end
+
+    it "raises GoogleException if exception is encountered upstream" do
+      error = { "error" => "Permissions issue" }
+      mock_exception = instance_double("Google Sheet Exception", body: error.to_json)
+      allow(mock_sheets_api).to receive(:batch_clear_values).and_yield(nil, mock_exception)
+      expect { described_class.new(sheets_api: mock_sheets_api).write(sheet_id:, range:, csv: "foo,bar,baz") }.to raise_exception(GoogleSheetException)
     end
   end
 end

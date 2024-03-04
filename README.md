@@ -30,8 +30,9 @@ The 2nd-line-support Google group is an 'Owner' of the service account, so anyon
 1. Clone the [form template](https://docs.google.com/forms/d/1PvCMjzCZeELjflHY22p6FH5rtPp3Lvql7LmHGoUSFjM/edit)
 2. Update the dates etc, but otherwise make no changes to the form structure
 3. Link it to a spreadsheet
-4. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`, as a Viewer. (Dismiss the warning about sharing with external email addresses)
-5. Send out the form, gather responses
+4. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`, as an Editor. (Dismiss the warning about sharing with external email addresses)
+5. Add a worksheet / 'tab' called "Auto-generated draft rota" (which is where the draft rota will be pushed by govuk-rota-generator)
+6. Send out the form, gather responses
 
 ### Get the data ready
 
@@ -71,9 +72,9 @@ people:
 
 ### Generate the rota
 
-Run `ruby bin/generate_rota.rb`.
+Run `ruby bin/generate_rota.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`.
 
 This generates a `data/generated_rota.yml` file, which has the same structure as the `data/rota_inputs.yml` file.
-But the script will also output a user-friendly CSV to STDOUT, which can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty) (automating the overriding of PagerDuty schedules) as well as be imported to a 2nd line rota spreadsheet.
+But the script will also output a user-friendly CSV to the "Auto-generated draft rota" worksheet you set up earlier, or to STDOUT if you don't provide the Google Sheet CLI parameter. The worksheet/CSV can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty) (automating the overriding of PagerDuty schedules).
 
 Note that you can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml), to influence how often folks are assigned to particular roles.
