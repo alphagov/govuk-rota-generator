@@ -28,5 +28,5 @@ else
   puts "Writing CSV to Google Sheets"
   SHEET_ID = SHEET_URL.match(/spreadsheets\/d\/([^\/]+)/)[1]
   GoogleSheet.new(scope: :write).write(sheet_id: SHEET_ID, csv: presenter.to_csv(summarised: :weekly))
-  puts "Draft rota visible in the relevant worksheet at https://docs.google.com/spreadsheets/d/#{sheet_id}/edit"
+  puts "Draft rota visible in the relevant worksheet at https://docs.google.com/spreadsheets/d/#{SHEET_ID}/edit"
 end
