@@ -158,4 +158,17 @@ RSpec.describe DataProcessor do
       )
     end
   end
+
+  describe ".parse_csv" do
+    it "converts a CSV representation of a rota into the YML structure used by govuk-rota-generator" do
+      draft_csv = "#{File.dirname(__FILE__)}/fixtures/data_processor/parse_csv/draft_rota.csv"
+      expected_output = "#{File.dirname(__FILE__)}/fixtures/data_processor/parse_csv/draft_rota.yml"
+
+      filepath = "#{File.dirname(__FILE__)}/tmp/local.yml"
+      File.delete(filepath) if File.exist? filepath
+
+      described_class.parse_csv(rota_csv: draft_csv, rota_yml_output: filepath)
+      expect(File.read(filepath)).to eq(File.read(expected_output))
+    end
+  end
 end

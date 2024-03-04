@@ -1,0 +1,268 @@
+---
+dates:
+- 01/04/2024
+- 02/04/2024
+- 03/04/2024
+- 04/04/2024
+- 05/04/2024
+- 06/04/2024
+- 07/04/2024
+- '08/04/2024'
+- '09/04/2024'
+- 10/04/2024
+- 11/04/2024
+- 12/04/2024
+- 13/04/2024
+- 14/04/2024
+people:
+- email: joe.bloggs@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary
+  - :inhours_secondary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_primary
+    date: 01/04/2024
+  - role: :inhours_primary
+    date: 02/04/2024
+  - role: :inhours_primary
+    date: 03/04/2024
+  - role: :inhours_primary
+    date: 04/04/2024
+  - role: :inhours_primary
+    date: 05/04/2024
+  - role: :inhours_primary
+    date: 06/04/2024
+  - role: :inhours_primary
+    date: 07/04/2024
+  - role: :inhours_secondary
+    date: '08/04/2024'
+  - role: :inhours_secondary
+    date: '09/04/2024'
+  - role: :inhours_secondary
+    date: 10/04/2024
+  - role: :inhours_secondary
+    date: 11/04/2024
+  - role: :inhours_secondary
+    date: 12/04/2024
+  - role: :inhours_secondary
+    date: 13/04/2024
+  - role: :inhours_secondary
+    date: 14/04/2024
+- email: sam.smith@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_secondary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_secondary
+    date: 01/04/2024
+  - role: :inhours_secondary
+    date: 02/04/2024
+  - role: :inhours_secondary
+    date: 03/04/2024
+  - role: :inhours_secondary
+    date: 04/04/2024
+  - role: :inhours_secondary
+    date: 05/04/2024
+  - role: :inhours_secondary
+    date: 06/04/2024
+  - role: :inhours_secondary
+    date: 07/04/2024
+- email: jonny.james@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary_standby
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_primary_standby
+    date: 01/04/2024
+  - role: :inhours_primary_standby
+    date: 02/04/2024
+  - role: :inhours_primary_standby
+    date: 03/04/2024
+  - role: :inhours_primary_standby
+    date: 04/04/2024
+  - role: :inhours_primary_standby
+    date: 05/04/2024
+  - role: :inhours_primary_standby
+    date: 06/04/2024
+  - role: :inhours_primary_standby
+    date: 07/04/2024
+- email: phil.c@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_secondary_standby
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_secondary_standby
+    date: 01/04/2024
+  - role: :inhours_secondary_standby
+    date: 02/04/2024
+  - role: :inhours_secondary_standby
+    date: 03/04/2024
+  - role: :inhours_secondary_standby
+    date: 04/04/2024
+  - role: :inhours_secondary_standby
+    date: 05/04/2024
+  - role: :inhours_secondary_standby
+    date: 06/04/2024
+  - role: :inhours_secondary_standby
+    date: 07/04/2024
+- email: jamie.jameson@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :oncall_primary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :oncall_primary
+    date: 01/04/2024
+  - role: :oncall_primary
+    date: 02/04/2024
+  - role: :oncall_primary
+    date: 03/04/2024
+  - role: :oncall_primary
+    date: 04/04/2024
+  - role: :oncall_primary
+    date: 05/04/2024
+  - role: :oncall_primary
+    date: 06/04/2024
+  - role: :oncall_primary
+    date: 07/04/2024
+- email: maxine.maxon@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :oncall_secondary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :oncall_secondary
+    date: 01/04/2024
+  - role: :oncall_secondary
+    date: 02/04/2024
+  - role: :oncall_secondary
+    date: 03/04/2024
+  - role: :oncall_secondary
+    date: 04/04/2024
+  - role: :oncall_secondary
+    date: 05/04/2024
+  - role: :oncall_secondary
+    date: 06/04/2024
+  - role: :oncall_secondary
+    date: 07/04/2024
+- email: dev.eloper@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_primary
+    date: '08/04/2024'
+  - role: :inhours_primary
+    date: 11/04/2024
+  - role: :inhours_primary
+    date: 12/04/2024
+  - role: :inhours_primary
+    date: 13/04/2024
+  - role: :inhours_primary
+    date: 14/04/2024
+- email: carl.e@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_primary
+    date: '09/04/2024'
+- email: jo.c@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_primary
+    date: 10/04/2024
+- email: kenny.kennedy@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary_standby
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :inhours_primary_standby
+    date: '08/04/2024'
+  - role: :inhours_primary_standby
+    date: '09/04/2024'
+  - role: :inhours_primary_standby
+    date: 10/04/2024
+  - role: :inhours_primary_standby
+    date: 11/04/2024
+  - role: :inhours_primary_standby
+    date: 12/04/2024
+  - role: :inhours_primary_standby
+    date: 13/04/2024
+  - role: :inhours_primary_standby
+    date: 14/04/2024
+- email: bob.builder@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :oncall_primary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :oncall_primary
+    date: '08/04/2024'
+  - role: :oncall_primary
+    date: '09/04/2024'
+  - role: :oncall_primary
+    date: 10/04/2024
+  - role: :oncall_primary
+    date: 11/04/2024
+  - role: :oncall_primary
+    date: 12/04/2024
+  - role: :oncall_primary
+    date: 13/04/2024
+  - role: :oncall_primary
+    date: 14/04/2024
+- email: arnold.arnie@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :oncall_secondary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts:
+  - role: :oncall_secondary
+    date: '08/04/2024'
+  - role: :oncall_secondary
+    date: '09/04/2024'
+  - role: :oncall_secondary
+    date: 10/04/2024
+  - role: :oncall_secondary
+    date: 11/04/2024
+  - role: :oncall_secondary
+    date: 12/04/2024
+  - role: :oncall_secondary
+    date: 13/04/2024
+  - role: :oncall_secondary
+    date: 14/04/2024
