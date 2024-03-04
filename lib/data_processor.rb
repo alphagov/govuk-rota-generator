@@ -63,6 +63,10 @@ class DataProcessor
   def self.dates(week_commencing_fields)
     first_date = week_commencing_fields.first.match(/^Week commencing (.+)$/)[1]
     last_date = (Date.parse(week_commencing_fields.last.match(/^Week commencing (.+)$/)[1]) + 6).strftime("%d/%m/%Y")
+    date_range(first_date, last_date)
+  end
+
+  def self.date_range(first_date, last_date)
     dates = [first_date]
     tmp = first_date
     while tmp != last_date
@@ -165,5 +169,53 @@ class DataProcessor
 
       date_this_week = date_next_week
     end
+  end
+
+  def self.parse_csv(rota_csv:, rota_yml_output:)
+    rota_csv = CSV.read(rota_csv, headers: true)
+
+    people_data = {}
+    rota_csv.each do |week_data|
+      (week_data.headers - %w[week]).each do |role|
+        name = week_data[role]
+        next if name.nil?
+
+        overrides = []
+        if name.include?("(")
+          # e.g. "Dev Eloper (Carl E on 09/04/2024, Jo C on 10/04/2024)"
+          overrides = name.match(/\((.+)\)/)[1].split(",").map do |override|
+            parts = override.strip.match(/(.+) on (.+)/)
+            { name: parts[1], date: parts[2] }
+          end
+          name = name.match(/^(.+) \(/)[1]
+        end
+
+        people_data[name] = { assigned_shifts: [] } unless people_data[name]
+        date_range(*week_data["week"].split("-")).each do |date|
+          next if overrides.find { |override| override[:date] == date }
+
+          people_data[name][:assigned_shifts] << { role: role.to_sym, date: }
+        end
+
+        overrides.each do |override|
+          people_data[override[:name]] = { assigned_shifts: [] } unless people_data[override[:name]]
+          people_data[override[:name]][:assigned_shifts] << { role: role.to_sym, date: override[:date] }
+        end
+      end
+    end
+    people = people_data.map do |name, person_data|
+      Person.new(
+        email: "#{name.downcase.sub(' ', '.')}@digital.cabinet-office.gov.uk",
+        team: "Unknown",
+        assigned_shifts: person_data[:assigned_shifts],
+        can_do_roles: person_data[:assigned_shifts].map { |shift| shift[:role].to_sym }.uniq,
+      ).to_h
+    end
+
+    first_date = rota_csv.first["week"].split("-").first
+    last_date = rota_csv.to_a.last.first.split("-").last
+    dates = date_range(first_date, last_date)
+
+    File.write(rota_yml_output, { "dates" => dates, "people" => people }.to_yaml)
   end
 end
