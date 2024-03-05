@@ -77,6 +77,28 @@ class RotaPresenter
     multidimensional_array_to_csv(rows)
   end
 
+  def fairness_summary(roles_config:)
+    roles_config = Roles.new(config: roles_config)
+    sorted_people = @people.sort_by { |person| - roles_config.value_of_shifts(person.assigned_shifts) }
+    people_summaries = sorted_people.map do |person|
+      shifts = person
+        .assigned_shifts
+        .group_by { |shift| shift[:role] }
+        .map { |role, grouped_shifts| "#{grouped_shifts.count} #{role}" }
+        .join(", ")
+
+      if person.assigned_shifts.count.zero?
+        "#{person.name} was not assigned to any shifts.'n" \
+        "  (They're eligible for #{person.can_do_roles == [] ? 'no roles' : person.can_do_roles})."
+      else
+        "#{person.name} has #{roles_config.value_of_shifts(person.assigned_shifts)} " \
+        "units of inconvenience, made up of #{person.assigned_shifts.count} shifts " \
+        "including #{shifts}." \
+      end
+    end
+    people_summaries.join("\n")
+  end
+
 private
 
   def roles

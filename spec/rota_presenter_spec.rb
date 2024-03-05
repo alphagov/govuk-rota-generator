@@ -70,4 +70,35 @@ RSpec.describe RotaPresenter do
       )
     end
   end
+
+  describe "#fairness_summary" do
+    it "describes the fairness of the generated rota" do
+      filepath = "#{File.dirname(__FILE__)}/fixtures/generated_rota.yml"
+      fixture_data = YAML.load_file(filepath, symbolize_names: true)
+      people = fixture_data[:people].map { |person_data| Person.new(**person_data) }
+      presenter = described_class.new(people:, dates: [])
+      roles_config = {
+        inhours_primary: {
+          value: 1,
+          weekdays: true,
+          weeknights: false,
+          weekends: false,
+        },
+        oncall_primary: {
+          value: 2,
+          weekdays: false,
+          weeknights: true,
+          weekends: true,
+        },
+      }
+
+      expect(presenter.fairness_summary(roles_config:)).to eq(
+        <<~OUTPUT.chomp,
+          C has 18 units of inconvenience, made up of 9 shifts including 9 oncall_primary.
+          B has 16 units of inconvenience, made up of 11 shifts including 5 oncall_primary, 6 inhours_primary.
+          A has 4 units of inconvenience, made up of 4 shifts including 4 inhours_primary.
+        OUTPUT
+      )
+    end
+  end
 end
