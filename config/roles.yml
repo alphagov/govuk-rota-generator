@@ -8,12 +8,12 @@ inhours_secondary:
   weekdays: true
   weeknights: false
   weekends: false
-inhours_primary_standby:
+inhours_standby_primary:
   value: 0.75
   weekdays: true
   weeknights: false
   weekends: false
-inhours_secondary_standby:
+inhours_standby_secondary:
   value: 0.75
   weekdays: true
   weeknights: false
