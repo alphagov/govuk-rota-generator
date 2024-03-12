@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem "activesupport"
 gem "google-apis-sheets_v4"
 gem "googleauth"
 
