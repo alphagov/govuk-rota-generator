@@ -1,34 +1,31 @@
 require "yaml"
-require_relative "../lib/rota_generator"
-require_relative "../lib/fairness_calculator"
+require_relative "../lib/algorithms/weekly"
+require_relative "../lib/google_sheet"
+require_relative "../lib/person"
+require_relative "../lib/rota_presenter"
 
-INPUT_CSV = File.dirname(__FILE__) + "/../data/combined.csv"
-WEEKS_TO_GENERATE = 13
-ROLES_CONFIG = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
+yml = YAML.load_file(File.dirname(__FILE__) + "/../data/rota_inputs.yml", symbolize_names: true)
+people = yml[:people].map { |person_data| Person.new(**person_data) }
+dates = yml[:dates]
+roles_config = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
 
-puts "We want to generate a rota of #{WEEKS_TO_GENERATE} weeks, with the following roles in each week: #{ROLES_CONFIG.keys.join(", ")}"
-slots_to_fill = WEEKS_TO_GENERATE * ROLES_CONFIG.keys.count
-generator = RotaGenerator.new(csv: INPUT_CSV)
+Algorithms::Weekly.fill_slots!(dates:, people:, roles_config:)
 
-puts "There are #{slots_to_fill} slots to fill, and #{generator.people.count} people on the rota."
-puts "Each person therefore needs to take an average of #{slots_to_fill / generator.people.count.to_f} slot(s)."
-puts ""
-generator.fill_slots(
-  generator.people,
-  generator.slots_to_fill(WEEKS_TO_GENERATE, ROLES_CONFIG),
-  ROLES_CONFIG,
-)
-puts "All shifts allocated. See CSV below:"
-puts ""
-puts generator.to_csv
-puts ""
-puts "Checking fairness of spread:"
-fairness_calculator = FairnessCalculator.new(ROLES_CONFIG)
-generator.people.sort_by { |person| fairness_calculator.weight_of_shifts(person.assigned_shifts) }.reverse.each do |person|
-  shift_types = person.assigned_shifts.map { |shift| shift[:role] }.uniq
-  shift_totals = shift_types.map do |role|
-    shift_count = person.assigned_shifts.select { |shift| shift[:role] == role }.count
-    "#{shift_count} #{role}"
-  end
-  puts "#{person.email} has been allocated #{sprintf('%.1f', fairness_calculator.weight_of_shifts(person.assigned_shifts))} units of inconvenience (#{person.assigned_shifts.count} shifts made up of #{shift_totals.join(',')})"
+presenter = RotaPresenter.new(dates:, people:, roles_config:)
+
+puts "Writing rota to YML locally..."
+File.write("#{File.dirname(__FILE__)}/../data/generated_rota.yml", presenter.to_yaml)
+
+SHEET_URL = ARGV.first
+if SHEET_URL.nil?
+  puts "All shifts allocated. See CSV below:"
+  puts ""
+  puts presenter.to_csv_weekly
+  puts ""
+  puts "You can automatically write this output to Google Sheet by providing a Google Sheet URL as a CLI arg."
+else
+  puts "Writing CSV to Google Sheets"
+  SHEET_ID = SHEET_URL.match(/spreadsheets\/d\/([^\/]+)/)[1]
+  GoogleSheet.new(scope: :write).write(sheet_id: SHEET_ID, csv: presenter.to_csv_weekly)
+  puts "Draft rota visible in the relevant worksheet at https://docs.google.com/spreadsheets/d/#{SHEET_ID}/edit"
 end

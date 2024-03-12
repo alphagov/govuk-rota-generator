@@ -29,9 +29,10 @@ The 2nd-line-support Google group is an 'Owner' of the service account, so anyon
 
 1. Clone the [form template](https://docs.google.com/forms/d/1PvCMjzCZeELjflHY22p6FH5rtPp3Lvql7LmHGoUSFjM/edit)
 2. Update the dates etc, but otherwise make no changes to the form structure
-3. Send out the form, gather responses
-4. Link it to a spreadsheet
-5. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`, as a Viewer. (Dismiss the warning about sharing with external email addresses)
+3. Link it to a spreadsheet
+4. Share the spreadsheet with `google-sheet-fetcher@govuk-rota-generator.iam.gserviceaccount.com`, as an Editor. (Dismiss the warning about sharing with external email addresses)
+5. Add a worksheet / 'tab' called "Auto-generated draft rota" (which is where the draft rota will be pushed by govuk-rota-generator)
+6. Send out the form, gather responses
 
 ### Get the data ready
 
@@ -39,19 +40,47 @@ Run the `fetch_data` script, passing the URL of your responses spreadsheet as a 
 
 `ruby bin/fetch_data.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`
 
-This will generate a `data/combined.csv` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
+This will generate a `data/rota_inputs.yml` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
 
 The generated file will look something like:
 
-```csv
-name,team,can_do_inhours_primary,can_do_inhours_secondary,can_do_inhours_primary_standby,can_do_inhours_secondary_standby,can_do_oncall_primary,can_do_oncall_secondary,forbidden_weeks
-Some Person,Find and View,false,false,false,false,false,true,true,"6,10"
+```yml
+---
+dates:
+- 01/04/2024
+- 02/04/2024
+- 03/04/2024
+- 04/04/2024
+- 05/04/2024
+- 06/04/2024
+- 07/04/2024
+people:
+- email: dev.eloper@digital.cabinet-office.gov.uk
+  team: Unknown
+  non_working_days: []
+  can_do_roles:
+  - :inhours_primary
+  - :inhours_secondary
+  - :inhours_primary_standby
+  - :inhours_secondary_standby
+  - :oncall_primary
+  - :oncall_secondary
+  forbidden_in_hours_days: []
+  forbidden_on_call_days: []
+  assigned_shifts: []
 ```
 
 ### Generate the rota
 
-Run `ruby bin/generate_rota.rb` (it will output to STDOUT).
+Run `ruby bin/generate_rota.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`.
 
-You can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml).
+This generates a `data/generated_rota.yml` file, which has the same structure as the `data/rota_inputs.yml` file.
+But the script will also output a user-friendly CSV to the "Auto-generated draft rota" worksheet you set up earlier, or to STDOUT if you don't provide the Google Sheet CLI parameter. The worksheet/CSV can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty) (automating the overriding of PagerDuty schedules).
 
-The generated output can be used as the `data/rota.csv` in [pay-pagerduty](https://github.com/alphagov/pay-pagerduty), which automates the overriding of PagerDuty schedules.
+Note that you can tweak the weighting of each 'role' (e.g. `oncall_primary`) by editing the values in [config/roles.yml](config/roles.yml), to influence how often folks are assigned to particular roles.
+
+### Check the fairness of the rota
+
+Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`.
+
+This summarises the fairness of the rota at the "Auto-generated draft rota" worksheet you set up earlier.

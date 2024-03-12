@@ -1,22 +1,23 @@
 require "date"
-require_relative "./randomiser"
+require_relative "./roles"
 
 class ForbiddenRoleException < StandardError; end
-class ForbiddenWeekException < StandardError; end
+class ForbiddenDateException < StandardError; end
 class MultipleRolesException < StandardError; end
 class ShiftNotAssignedException < StandardError; end
 
 class Person
-  attr_reader :email, :team, :non_working_days, :assigned_shifts, :random_factor
+  attr_reader :email, :team, :can_do_roles, :non_working_days, :assigned_shifts
 
-  def initialize(email:, team:, can_do_roles:, forbidden_weeks:, non_working_days: [])
+  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [], assigned_shifts: [])
     @email = email
     @team = team
     @non_working_days = non_working_days
     @can_do_roles = can_do_roles
-    @forbidden_weeks = forbidden_weeks
-    @assigned_shifts = []
-    @random_factor = Randomiser.instance.next_float
+    @forbidden_in_hours_days = forbidden_in_hours_days
+    @forbidden_on_call_days = forbidden_on_call_days
+    @assigned_shifts = assigned_shifts
+    @roles_config = Roles.new
   end
 
   def name
@@ -27,24 +28,57 @@ class Person
     @can_do_roles.include?(role)
   end
 
-  def availability(week:)
-    @forbidden_weeks.include?(week) ? [] : @can_do_roles
-  end
+  def availability(date:)
+    return [] if @assigned_shifts.find { |shift| shift[:date] == date }
 
-  def assign(role:, week:)
-    raise ForbiddenRoleException unless can_do_role?(role)
-    raise ForbiddenWeekException if availability(week:).empty?
-    if (conflicting_shift = @assigned_shifts.find { |shift| shift[:week] == week })
-      raise MultipleRolesException, "Failed to assign role #{role} to #{email} in week #{week} as they're already assigned to #{conflicting_shift[:role]}"
+    available_roles = @can_do_roles
+    day_of_week = Date.parse(date).strftime("%A")
+
+    if @forbidden_in_hours_days.include?(date) || non_working_days.include?(day_of_week)
+      available_roles -= @roles_config.by_type(%i[weekdays])
     end
 
-    @assigned_shifts << { week:, role: }
+    if @forbidden_on_call_days.include?(date)
+      available_roles -= @roles_config.by_type(%i[weekends weeknights])
+    end
+
+    available_roles
   end
 
-  def unassign(role:, week:)
-    shift_to_unassign = @assigned_shifts.find { |shift| shift[:week] == week && shift[:role] == role }
+  def assign(role:, date:)
+    if (conflicting_shift = @assigned_shifts.find { |shift| shift[:date] == date })
+      raise MultipleRolesException, "Failed to assign role #{role} to #{email} on date #{date} as they're already assigned to #{conflicting_shift[:role]}"
+    end
+
+    raise ForbiddenRoleException unless can_do_role?(role)
+    raise ForbiddenDateException unless availability(date:).include?(role)
+
+    @assigned_shifts << { date:, role: }
+
+    @assigned_shifts.sort! { |a, b| Date.parse(a[:date]) <=> Date.parse(b[:date]) }
+  end
+
+  def unassign(role:, date:)
+    shift_to_unassign = @assigned_shifts.find { |shift| shift[:date] == date && shift[:role] == role }
     raise ShiftNotAssignedException if shift_to_unassign.nil?
 
     @assigned_shifts.delete(shift_to_unassign)
+  end
+
+  def to_h
+    excluded_ivars = ["@roles_config"]
+
+    hash = {}
+    instance_variables.each do |variable|
+      next if excluded_ivars.include? variable.to_s
+
+      value = instance_variable_get(variable)
+      if value.is_a?(Array) && value.first.is_a?(Hash)
+        value = value.map { |element| element.transform_keys(&:to_s) }
+      end
+
+      hash[variable.to_s.delete("@")] = value
+    end
+    hash
   end
 end
