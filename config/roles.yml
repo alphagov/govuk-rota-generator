@@ -3,11 +3,17 @@ inhours_primary:
   weekdays: true
   weeknights: false
   weekends: false
+  pagerduty:
+    schedule_name: GOV.UK Primary (1st Call)
+    schedule_id: P479TSJ
 inhours_secondary:
   value: 1
   weekdays: true
   weeknights: false
   weekends: false
+  pagerduty:
+    schedule_name: GOV.UK Secondary (2nd Call)
+    schedule_id: P752O37
 inhours_standby_primary:
   value: 0.9
   weekdays: true
@@ -23,8 +29,14 @@ oncall_primary:
   weekdays: false
   weeknights: true
   weekends: true
+  pagerduty:
+    schedule_name: GOV.UK Primary (1st Call)
+    schedule_id: P479TSJ
 oncall_secondary:
   value: 1
   weekdays: false
   weeknights: true
   weekends: true
+  pagerduty:
+    schedule_name: GOV.UK Secondary (2nd Call)
+    schedule_id: P752O37
