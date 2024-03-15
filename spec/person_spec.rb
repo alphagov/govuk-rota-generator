@@ -176,6 +176,34 @@ RSpec.describe Person do
     end
   end
 
+  describe "#formatted_shifts" do
+    it "takes an optional argument to specify the shift type" do
+      person.assign(role: :inhours_primary, date: "08/04/2024")
+      person.assign(role: :oncall_primary, date: "09/04/2024")
+
+      expect(person.formatted_shifts(:oncall_primary)).to eq([
+        {
+          role: :oncall_primary,
+          start_datetime: "2024-04-09T17:30:00+01:00",
+          end_datetime: "2024-04-10T09:30:00+01:00",
+        },
+      ])
+    end
+
+    it "merges shifts when there is no gap between them" do
+      person.assign(role: :oncall_primary, date: "12/04/2024") # Friday
+      person.assign(role: :oncall_primary, date: "13/04/2024") # Saturday
+      person.assign(role: :oncall_primary, date: "14/04/2024") # Saturday
+      expect(person.formatted_shifts).to eq([
+        {
+          role: :oncall_primary,
+          start_datetime: "2024-04-12T17:30:00+01:00",
+          end_datetime: "2024-04-15T09:30:00+01:00",
+        },
+      ])
+    end
+  end
+
   describe "#to_h" do
     it "returns all the metadata about the person needed to generate a rota" do
       expected_hash = person_configuration
