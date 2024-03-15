@@ -88,4 +88,30 @@ RSpec.describe Roles do
       expect(roles.value_of_shifts(shifts)).to eq(4)
     end
   end
+
+  describe "#pagerduty_roles" do
+    it "returns all the role IDs of roles that should correspond to a specific schedule in Pagerduty" do
+      pagerduty_role = {
+        value: 2,
+        weekdays: true,
+        weeknights: false,
+        weekends: false,
+        pagerduty: {
+          schedule_name: "GOV.UK Secondary (2nd Call)",
+          schedule_id: "P752O37",
+        },
+      }
+      roles_config = {
+        foo: {
+          value: 2,
+          weekdays: true,
+          weeknights: false,
+          weekends: false,
+        },
+        bar: pagerduty_role,
+      }
+      roles = described_class.new(config: roles_config)
+      expect(roles.pagerduty_roles).to eq({ bar: pagerduty_role })
+    end
+  end
 end

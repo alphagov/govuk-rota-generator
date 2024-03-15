@@ -24,4 +24,8 @@ class Roles
     end
     values.sum.round(2)
   end
+
+  def pagerduty_roles
+    @config.select { |_key, config| config[:pagerduty] }
+  end
 end
