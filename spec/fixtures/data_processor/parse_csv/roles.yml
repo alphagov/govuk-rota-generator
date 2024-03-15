@@ -1,0 +1,30 @@
+inhours_primary:
+  value: 1
+  weekdays: true
+  weeknights: false
+  weekends: false
+inhours_secondary:
+  value: 1
+  weekdays: true
+  weeknights: false
+  weekends: false
+inhours_standby_primary:
+  value: 0.9
+  weekdays: true
+  weeknights: false
+  weekends: false
+inhours_standby_secondary:
+  value: 0.9
+  weekdays: true
+  weeknights: false
+  weekends: false
+oncall_primary:
+  value: 1
+  weekdays: false
+  weeknights: true
+  weekends: true
+oncall_secondary:
+  value: 1
+  weekdays: false
+  weeknights: true
+  weekends: true

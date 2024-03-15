@@ -34,10 +34,6 @@ people:
     date: 04/04/2024
   - role: :inhours_primary
     date: 05/04/2024
-  - role: :inhours_primary
-    date: 06/04/2024
-  - role: :inhours_primary
-    date: 07/04/2024
   - role: :inhours_secondary
     date: '08/04/2024'
   - role: :inhours_secondary
@@ -48,10 +44,6 @@ people:
     date: 11/04/2024
   - role: :inhours_secondary
     date: 12/04/2024
-  - role: :inhours_secondary
-    date: 13/04/2024
-  - role: :inhours_secondary
-    date: 14/04/2024
 - email: sam.smith@digital.cabinet-office.gov.uk
   team: Unknown
   non_working_days: []
@@ -70,10 +62,6 @@ people:
     date: 04/04/2024
   - role: :inhours_secondary
     date: 05/04/2024
-  - role: :inhours_secondary
-    date: 06/04/2024
-  - role: :inhours_secondary
-    date: 07/04/2024
 - email: jonny.james@digital.cabinet-office.gov.uk
   team: Unknown
   non_working_days: []
@@ -92,10 +80,6 @@ people:
     date: 04/04/2024
   - role: :inhours_standby_primary
     date: 05/04/2024
-  - role: :inhours_standby_primary
-    date: 06/04/2024
-  - role: :inhours_standby_primary
-    date: 07/04/2024
 - email: phil.c@digital.cabinet-office.gov.uk
   team: Unknown
   non_working_days: []
@@ -114,10 +98,6 @@ people:
     date: 04/04/2024
   - role: :inhours_standby_secondary
     date: 05/04/2024
-  - role: :inhours_standby_secondary
-    date: 06/04/2024
-  - role: :inhours_standby_secondary
-    date: 07/04/2024
 - email: jamie.jameson@digital.cabinet-office.gov.uk
   team: Unknown
   non_working_days: []
@@ -176,10 +156,6 @@ people:
     date: 11/04/2024
   - role: :inhours_primary
     date: 12/04/2024
-  - role: :inhours_primary
-    date: 13/04/2024
-  - role: :inhours_primary
-    date: 14/04/2024
 - email: carl.e@digital.cabinet-office.gov.uk
   team: Unknown
   non_working_days: []
@@ -218,10 +194,6 @@ people:
     date: 11/04/2024
   - role: :inhours_standby_primary
     date: 12/04/2024
-  - role: :inhours_standby_primary
-    date: 13/04/2024
-  - role: :inhours_standby_primary
-    date: 14/04/2024
 - email: bob.builder@digital.cabinet-office.gov.uk
   team: Unknown
   non_working_days: []
