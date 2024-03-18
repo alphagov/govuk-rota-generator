@@ -84,3 +84,43 @@ Note that you can tweak the weighting of each 'role' (e.g. `oncall_primary`) by 
 Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`.
 
 This summarises the fairness of the rota at the "Auto-generated draft rota" worksheet you set up earlier.
+
+### Synchronise the rota with PagerDuty
+
+#### Export an API key
+
+You'll need a PagerDuty API key associated with PagerDuty account that has "Global Admin" access (which can be [configured in govuk-user-reviewer](https://github.com/alphagov/govuk-user-reviewer/blob/89102b7778cdf391e4aa6f3e830615093101cc39/config/govuk_tech.yml#L258-L260)):
+
+1. Log into PagerDuty
+1. Navigate to "My Profile"
+1. Click on "User Settings"
+1. Click "Create API User Token"
+
+Export this token as an ENV variable:
+
+```sh
+export PAGER_DUTY_API_KEY=$(more ~/pagerduty_token.txt)
+```
+
+#### Run the synchroniser script
+
+You can now synchronise a rota with PagerDuty using:
+
+```sh
+ruby bin/sync_pagerduty.rb
+```
+
+This will:
+
+1. Use the rota in `data/tmp_rota.yml` (created automatically by the "calculate fairness" script)
+1. Map the roles in that rota to the roles in `config/roles.yml`, where it finds the corresponding PagerDuty schedule IDs
+1. Fetch the list of PagerDuty users and match these up with the users in your rota, warning on any names that are missing from PagerDuty (and skipping over those shifts)
+1. Find conflicts between the PagerDuty schedule and the local rota, and apply overrides to fix them
+
+By default, the script will ask you to approve each override: `y` to override, `n` to skip, and `exit` to close the script altogether. This means you can do a 'dry run' of the synchroniser by choosing `n` each time.
+
+If you wish to approve all of the overrides at once, you can pass the `--bulk` option:
+
+```sh
+ruby bin/sync_pagerduty.rb --bulk
+```
