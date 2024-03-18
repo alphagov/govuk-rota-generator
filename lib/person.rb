@@ -7,11 +7,12 @@ class MultipleRolesException < StandardError; end
 class ShiftNotAssignedException < StandardError; end
 
 class Person
-  attr_accessor :pagerduty_user_id
+  attr_accessor :name, :pagerduty_user_id
   attr_reader :email, :team, :can_do_roles, :non_working_days, :assigned_shifts
 
   def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [], assigned_shifts: [])
     @email = email
+    @name = email.match(/(.+)@(.+)$/)[1].split(".").map(&:capitalize).join(" ")
     @team = team
     @non_working_days = non_working_days
     @can_do_roles = can_do_roles
@@ -19,10 +20,6 @@ class Person
     @forbidden_on_call_days = forbidden_on_call_days
     @assigned_shifts = assigned_shifts
     @roles_config = Roles.new
-  end
-
-  def name
-    email.match(/(.+)@(.+)$/)[1].split(".").map(&:capitalize).join(" ")
   end
 
   def can_do_role?(role)
@@ -79,7 +76,7 @@ class Person
   end
 
   def to_h
-    excluded_ivars = ["@roles_config"]
+    excluded_ivars = ["@name", "@roles_config"]
 
     hash = {}
     instance_variables.each do |variable|

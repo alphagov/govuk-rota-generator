@@ -114,8 +114,10 @@ This will:
 
 1. Use the rota in `data/tmp_rota.yml` (created automatically by the "calculate fairness" script)
 1. Map the roles in that rota to the roles in `config/roles.yml`, where it finds the corresponding PagerDuty schedule IDs
-1. Fetch the list of PagerDuty users and match these up with the users in your rota, warning on any names that are missing from PagerDuty (and skipping over those shifts)
+1. Fetch the list of PagerDuty users and match these up with the users in your rota, warning on any names that are missing from PagerDuty (and skipping over those shifts)±
 1. Find conflicts between the PagerDuty schedule and the local rota, and apply overrides to fix them
+
+± These engineers either don't have PagerDuty accounts yet (because they lack Production Admin access - you can [provide temporary access via govuk-user-reviewer](https://github.com/alphagov/govuk-user-reviewer/pull/1194)), or the name derived from their email address doesn't match the name PagerDuty has for them. For the latter, you can specify the mapping of the names in `config/pagerduty_config_overrides.yml`.
 
 By default, the script will ask you to approve each override: `y` to override, `n` to skip, and `exit` to close the script altogether. This means you can do a 'dry run' of the synchroniser by choosing `n` each time.
 
