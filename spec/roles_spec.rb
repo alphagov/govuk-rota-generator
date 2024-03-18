@@ -114,4 +114,46 @@ RSpec.describe Roles do
       expect(roles.pagerduty_roles).to eq({ bar: pagerduty_role })
     end
   end
+
+  describe "#start_datetime" do
+    it "returns start datetime for given date and role type" do
+      roles_config = {
+        inhours: {
+          weekdays: true,
+          weeknights: false,
+          weekends: false,
+        },
+        oncall: {
+          weekdays: false,
+          weeknights: true,
+          weekends: true,
+        },
+      }
+      roles = described_class.new(config: roles_config)
+      expect(roles.start_datetime("08/04/2024", :inhours)).to eq("2024-04-08T09:30:00+01:00") # Monday in-hours 9:30-5:30
+      expect(roles.start_datetime("08/04/2024", :oncall)).to eq("2024-04-08T17:30:00+01:00") # Monday on-call 5:30-9:30
+      expect(roles.start_datetime("13/04/2024", :oncall)).to eq("2024-04-13T09:30:00+01:00") # Saturday on-call 9:30am Sat -> 9:30am Sun
+    end
+  end
+
+  describe "#end_datetime" do
+    it "returns end datetime for given date and role type" do
+      roles_config = {
+        inhours: {
+          weekdays: true,
+          weeknights: false,
+          weekends: false,
+        },
+        oncall: {
+          weekdays: false,
+          weeknights: true,
+          weekends: true,
+        },
+      }
+      roles = described_class.new(config: roles_config)
+      expect(roles.end_datetime("08/04/2024", :inhours)).to eq("2024-04-08T17:30:00+01:00") # Monday in-hours 9:30-5:30
+      expect(roles.end_datetime("08/04/2024", :oncall)).to eq("2024-04-09T09:30:00+01:00") # Monday on-call 5:30-9:30
+      expect(roles.end_datetime("13/04/2024", :oncall)).to eq("2024-04-14T09:30:00+01:00") # Saturday on-call 9:30am Sat -> 9:30am Sun
+    end
+  end
 end
