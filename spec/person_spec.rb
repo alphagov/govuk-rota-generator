@@ -46,6 +46,14 @@ RSpec.describe Person do
     end
   end
 
+  describe "#pagerduty_user_id" do
+    it "can get and set a pagerduty_user_id" do
+      expect(person.pagerduty_user_id).to eq(nil)
+      person.pagerduty_user_id = "foo"
+      expect(person.pagerduty_user_id).to eq("foo")
+    end
+  end
+
   describe "#team" do
     it "returns the person's team" do
       expect(person.team).to eq("Platform Reliability")
