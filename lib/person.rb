@@ -7,6 +7,7 @@ class MultipleRolesException < StandardError; end
 class ShiftNotAssignedException < StandardError; end
 
 class Person
+  attr_accessor :pagerduty_user_id
   attr_reader :email, :team, :can_do_roles, :non_working_days, :assigned_shifts
 
   def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [], assigned_shifts: [])
@@ -65,6 +66,18 @@ class Person
     @assigned_shifts.delete(shift_to_unassign)
   end
 
+  def formatted_shifts(shift_type = nil)
+    shifts_to_format = shift_type.nil? ? @assigned_shifts : @assigned_shifts.select { |shift| shift[:role] == shift_type }
+    shifts_to_assign = shifts_to_format.map do |shift|
+      {
+        role: shift[:role],
+        start_datetime: @roles_config.start_datetime(shift[:date], shift[:role]),
+        end_datetime: @roles_config.end_datetime(shift[:date], shift[:role]),
+      }
+    end
+    consolidate_shifts(shifts_to_assign)
+  end
+
   def to_h
     excluded_ivars = ["@roles_config"]
 
@@ -80,5 +93,32 @@ class Person
       hash[variable.to_s.delete("@")] = value
     end
     hash
+  end
+
+private
+
+  def consolidate_shifts(shifts_to_assign)
+    # Consolidate shifts if there is no gap between them,
+    # e.g. one Friday 17:30-9:30 shift followed by one Saturday 9:30 - Sunday 9:30 shift
+    # would become a single Friday 17:30 - Sunday 9:30 shift
+    index = shifts_to_assign.count - 1
+    while index.positive?
+      shift = shifts_to_assign[index]
+      earlier_shift = shifts_to_assign[index - 1]
+
+      if earlier_shift[:end_datetime] == shift[:start_datetime] &&
+          earlier_shift[:person] == shift[:person]
+        consolidated_shift = shift.dup
+        consolidated_shift[:start_datetime] = earlier_shift[:start_datetime]
+        shifts_to_assign.delete(shift)
+        shifts_to_assign.delete(earlier_shift)
+        shifts_to_assign << consolidated_shift
+        shifts_to_assign.sort_by! { |hash| Date.parse(hash[:start_datetime]) }
+        index = shifts_to_assign.count - 1 # go back to beginning of queue in case there are more to merge into this shift
+      else
+        index -= 1
+      end
+    end
+    shifts_to_assign
   end
 end

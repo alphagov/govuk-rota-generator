@@ -148,7 +148,7 @@ class DataProcessor
     end
   end
 
-  def self.parse_csv(rota_csv:, rota_yml_output:)
+  def self.parse_csv(rota_csv:, roles_config:, rota_yml_output:)
     rota_csv = CSV.read(rota_csv, headers: true)
 
     people_data = {}
@@ -170,6 +170,8 @@ class DataProcessor
         people_data[name] = { assigned_shifts: [] } unless people_data[name]
         date_range(*week_data["week"].split("-")).each do |date|
           next if overrides.find { |override| override[:date] == date }
+
+          next if !roles_config[role.to_sym][:weekends] && %w[Saturday Sunday].include?(Date.parse(date).strftime("%A"))
 
           people_data[name][:assigned_shifts] << { role: role.to_sym, date: }
         end
