@@ -3,6 +3,7 @@ require_relative "../lib/person"
 require_relative "../lib/roles"
 
 rota = YAML.load_file(File.dirname(__FILE__) + "/../data/tmp_rota.yml", symbolize_names: true)
+overridden_names = YAML.load_file(File.dirname(__FILE__) + "/../config/pagerduty_config_overrides.yml", symbolize_names: true)
 pd = PagerdutyClient.new(api_token: ENV.fetch("PAGER_DUTY_API_KEY"))
 
 bulk_yes = false
@@ -22,8 +23,11 @@ people = rota[:people].map do |person_data|
     can_do_roles: [], # unknown - but doesn't matter
     assigned_shifts: person_data[:assigned_shifts],
   )
-  pagerduty_user = users.find { |user| user["name"] == person.name }
-  if pagerduty_user
+  if (overridden_name = overridden_names[:names].find { |name| name[:derived_from_email] == person.name })
+    person.name = overridden_name[:pagerduty]
+  end
+
+  if (pagerduty_user = users.find { |user| user["name"] == person.name })
     person.pagerduty_user_id = pagerduty_user["id"]
     person
   else
