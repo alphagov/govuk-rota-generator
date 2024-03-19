@@ -2,8 +2,8 @@ require_relative "../lib/pagerduty_client"
 require_relative "../lib/person"
 require_relative "../lib/roles"
 
-rota = YAML.load_file(File.dirname(__FILE__) + "/../data/tmp_rota.yml", symbolize_names: true)
-overridden_names = YAML.load_file(File.dirname(__FILE__) + "/../config/pagerduty_config_overrides.yml", symbolize_names: true)
+rota = YAML.load_file("#{File.dirname(__FILE__)}/../data/tmp_rota.yml", symbolize_names: true)
+overridden_names = YAML.load_file("#{File.dirname(__FILE__)}/../config/pagerduty_config_overrides.yml", symbolize_names: true)
 pd = PagerdutyClient.new(api_token: ENV.fetch("PAGER_DUTY_API_KEY"))
 
 bulk_yes = false
@@ -78,15 +78,16 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
       if bulk_yes
         action = "y"
       else
-        while !valid_action
-          action = (gets).chomp
-          valid_action = ["y", "n", "exit"].include?(action)
+        until valid_action
+          action = gets.chomp
+          valid_action = %w[y n exit].include?(action)
           puts "Option #{action.inspect} not recognised" unless valid_action
         end
       end
 
-      if action == "y"
-        puts "Overwriting... #{shift_to_assign[:person].pagerduty_user_id} to #{existing["start"]} to #{existing["end"]}"
+      case action
+      when "y"
+        puts "Overwriting... #{shift_to_assign[:person].pagerduty_user_id} to #{existing['start']} to #{existing['end']}"
         response = pd.create_override(schedule_id, shift_to_assign[:person].pagerduty_user_id, existing["start"], existing["end"])
 
         if response.code == 400
@@ -95,10 +96,10 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
         else
           puts "...overwrite applied!"
         end
-      elsif action == "n"
+      when "n"
         puts "Skipping."
         next
-      elsif action == "exit"
+      when "exit"
         exit
       end
     end
