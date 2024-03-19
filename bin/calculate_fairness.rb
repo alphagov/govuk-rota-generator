@@ -4,8 +4,8 @@ require_relative "../lib/google_sheet"
 require_relative "../lib/rota_presenter"
 
 ROTA_SHEET_ID = ARGV.first.match(/spreadsheets\/d\/([^\/]+)/)[1]
-TMP_ROTA_CSV = File.dirname(__FILE__) + "/../data/tmp_rota.csv"
-TMP_ROTA_YML = File.dirname(__FILE__) + "/../data/tmp_rota.yml"
+TMP_ROTA_CSV = "#{File.dirname(__FILE__)}/../data/tmp_rota.csv".freeze
+TMP_ROTA_YML = "#{File.dirname(__FILE__)}/../data/tmp_rota.yml".freeze
 
 roles_config = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
 
