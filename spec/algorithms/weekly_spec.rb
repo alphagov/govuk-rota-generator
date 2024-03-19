@@ -192,4 +192,102 @@ RSpec.describe Algorithms::Weekly do
       expect(person_c.assigned_shifts).to eq([])
     end
   end
+
+  describe ".balance_slots" do
+    let(:roles_config) { Roles.new(config: { foo: { value: 1, weekdays: true } }) }
+
+    it "reallocates shifts to spread the shift weight more evenly" do
+      underburdened_person = Person.new(
+        email: "b@b.com",
+        team: "Bar",
+        can_do_roles: %i[foo],
+        assigned_shifts: [],
+        roles_config:,
+      )
+      overburdened_person = Person.new(
+        email: "a@a.com",
+        team: "Baz",
+        can_do_roles: %i[foo],
+        assigned_shifts: [
+          { date: "01/04/2024", role: :foo },
+          { date: "02/04/2024", role: :foo },
+          { date: "03/04/2024", role: :foo },
+          { date: "04/04/2024", role: :foo },
+        ],
+        roles_config:,
+      )
+      people = [underburdened_person, overburdened_person]
+
+      described_class.balance_slots(people, roles_config)
+      expect(underburdened_person.assigned_shifts).to eq([
+        { date: "01/04/2024", role: :foo },
+      ])
+      expect(overburdened_person.assigned_shifts).to eq([
+        { date: "02/04/2024", role: :foo },
+        { date: "03/04/2024", role: :foo },
+        { date: "04/04/2024", role: :foo },
+      ])
+
+      described_class.balance_slots(people, roles_config)
+      expect(underburdened_person.assigned_shifts).to eq([
+        { date: "01/04/2024", role: :foo },
+        { date: "02/04/2024", role: :foo },
+      ])
+      expect(overburdened_person.assigned_shifts).to eq([
+        { date: "03/04/2024", role: :foo },
+        { date: "04/04/2024", role: :foo },
+      ])
+    end
+
+    it "reallocates shifts in the middle too, not just the extremes" do
+      underburdened_person = Person.new(
+        email: "got_off_scott_free@b.com",
+        team: "Bar",
+        can_do_roles: %i[foo],
+        assigned_shifts: [],
+        forbidden_in_hours_days: [
+          "03/04/2024",
+          "04/04/2024",
+          "05/04/2024",
+        ],
+        roles_config:,
+      )
+      overburdened_person = Person.new(
+        email: "help_me@a.com",
+        team: "Baz",
+        can_do_roles: %i[foo],
+        forbidden_in_hours_days: [
+          "03/04/2024",
+          "04/04/2024",
+          "05/04/2024",
+        ],
+        assigned_shifts: [
+          { date: "01/04/2024", role: :foo },
+          { date: "02/04/2024", role: :foo },
+        ],
+        roles_config:,
+      )
+      overburdened_person_that_cannot_be_helped = Person.new(
+        email: "cannot_help_me@a.com",
+        team: "Baz",
+        can_do_roles: %i[foo],
+        assigned_shifts: [
+          { date: "03/04/2024", role: :foo },
+          { date: "04/04/2024", role: :foo },
+          { date: "05/04/2024", role: :foo },
+        ],
+        roles_config:,
+      )
+      people = [underburdened_person, overburdened_person, overburdened_person_that_cannot_be_helped]
+
+      described_class.balance_slots(people, roles_config)
+
+      expect(underburdened_person.assigned_shifts).to eq([
+        { date: "01/04/2024", role: :foo },
+      ])
+      expect(overburdened_person.assigned_shifts).to eq([
+        { date: "02/04/2024", role: :foo },
+      ])
+    end
+  end
 end

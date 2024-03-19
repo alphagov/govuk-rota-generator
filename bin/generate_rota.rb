@@ -11,7 +11,23 @@ roles_config = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", s
 
 Algorithms::Weekly.fill_slots!(dates:, people:, roles_config:)
 
+<<<<<<< HEAD
 presenter = RotaPresenter.new(dates:, people:, roles_config:)
+=======
+# Experimental. Can call the balance step multiple times to attempt to
+# make rota more balanced.
+prev_standard_deviation = 2000
+standard_deviation = 1000
+while standard_deviation < prev_standard_deviation
+  "Running balancing step..."
+  prev_standard_deviation = standard_deviation
+  standard_deviation = RotaGenerator.balance_slots(people, Roles.new(config: roles_config))
+end
+puts "...maximised balancing."
+
+rota_output_file = "#{File.dirname(__FILE__)}/../data/generated_rota.yml"
+generator.write_rota(filepath: rota_output_file)
+>>>>>>> 1ffa1c6 (WIP: Attempt to rebalance shifts with additional passes)
 
 puts "Writing rota to YML locally..."
 File.write("#{File.dirname(__FILE__)}/../data/generated_rota.yml", presenter.to_yaml)
