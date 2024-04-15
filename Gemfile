@@ -9,5 +9,6 @@ group :test do
   gem "byebug"
   gem "rspec"
   gem "rubocop-govuk", require: false
+  gem "simplecov", require: false
   gem "webmock"
 end

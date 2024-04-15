@@ -1,5 +1,7 @@
 require "byebug"
+require "simplecov"
 require "webmock/rspec"
+SimpleCov.start
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
