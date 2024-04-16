@@ -6,3 +6,6 @@ data/
 google_service_account_key.json
 
 spec/tmp/
+
+# simplecov
+coverage/
