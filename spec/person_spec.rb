@@ -125,9 +125,10 @@ RSpec.describe Person do
       expect { person.assign(role: :oncall_secondary, date: "08/04/2024") }.to raise_exception(ForbiddenRoleException)
     end
 
-    it "raises an error when assigning multiple supported roles on an available date" do
+    it "raises an error when assigning multiple supported roles on an available date (unless `force: true` is passed)" do
       expect { person.assign(role: :inhours_primary, date: "08/04/2024") }.not_to raise_exception
       expect { person.assign(role: :inhours_secondary, date: "08/04/2024") }.to raise_exception(MultipleRolesException)
+      expect { person.assign(role: :inhours_secondary, date: "08/04/2024", force: true) }.not_to raise_exception
     end
   end
 

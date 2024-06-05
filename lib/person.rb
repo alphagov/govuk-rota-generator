@@ -43,13 +43,15 @@ class Person
     available_roles
   end
 
-  def assign(role:, date:)
-    if (conflicting_shift = @assigned_shifts.find { |shift| shift[:date] == date })
+  def assign(role:, date:, force: false)
+    if (conflicting_shift = @assigned_shifts.find { |shift| shift[:date] == date }) && !force
       raise MultipleRolesException, "Failed to assign role #{role} to #{email} on date #{date} as they're already assigned to #{conflicting_shift[:role]}"
     end
 
-    raise ForbiddenRoleException unless can_do_role?(role)
-    raise ForbiddenDateException unless availability(date:).include?(role)
+    unless force
+      raise ForbiddenRoleException unless can_do_role?(role)
+      raise ForbiddenDateException unless availability(date:).include?(role)
+    end
 
     @assigned_shifts << { date:, role: }
 
