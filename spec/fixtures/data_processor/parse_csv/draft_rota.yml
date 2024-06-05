@@ -66,37 +66,19 @@ people:
   team: Unknown
   non_working_days: []
   can_do_roles:
-  - :inhours_standby_primary
+  - :inhours_standby
   forbidden_in_hours_days: []
   forbidden_on_call_days: []
   assigned_shifts:
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 01/04/2024
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 02/04/2024
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 03/04/2024
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 04/04/2024
-  - role: :inhours_standby_primary
-    date: 05/04/2024
-- email: phil.c@digital.cabinet-office.gov.uk
-  team: Unknown
-  non_working_days: []
-  can_do_roles:
-  - :inhours_standby_secondary
-  forbidden_in_hours_days: []
-  forbidden_on_call_days: []
-  assigned_shifts:
-  - role: :inhours_standby_secondary
-    date: 01/04/2024
-  - role: :inhours_standby_secondary
-    date: 02/04/2024
-  - role: :inhours_standby_secondary
-    date: 03/04/2024
-  - role: :inhours_standby_secondary
-    date: 04/04/2024
-  - role: :inhours_standby_secondary
+  - role: :inhours_standby
     date: 05/04/2024
 - email: jamie.jameson@digital.cabinet-office.gov.uk
   team: Unknown
@@ -180,19 +162,19 @@ people:
   team: Unknown
   non_working_days: []
   can_do_roles:
-  - :inhours_standby_primary
+  - :inhours_standby
   forbidden_in_hours_days: []
   forbidden_on_call_days: []
   assigned_shifts:
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: '08/04/2024'
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: '09/04/2024'
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 10/04/2024
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 11/04/2024
-  - role: :inhours_standby_primary
+  - role: :inhours_standby
     date: 12/04/2024
 - email: bob.builder@digital.cabinet-office.gov.uk
   team: Unknown
