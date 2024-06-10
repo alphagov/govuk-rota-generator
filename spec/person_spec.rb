@@ -10,8 +10,7 @@ RSpec.describe Person do
       can_do_roles: %i[
         inhours_primary
         inhours_secondary
-        inhours_standby_primary
-        inhours_standby_secondary
+        inhours_standby
         oncall_primary
       ],
       forbidden_in_hours_days: [
@@ -74,7 +73,7 @@ RSpec.describe Person do
   describe "#can_do_role?" do
     it "returns `true` for roles that the person can do" do
       expect(person.can_do_role?(:inhours_primary)).to eq(true)
-      expect(person.can_do_role?(:inhours_standby_secondary)).to eq(true)
+      expect(person.can_do_role?(:inhours_standby)).to eq(true)
     end
 
     it "returns `false` for roles that the person cannot do" do
@@ -87,8 +86,7 @@ RSpec.describe Person do
       expect(person.availability(date: "08/04/2024")).to eq(%i[
         inhours_primary
         inhours_secondary
-        inhours_standby_primary
-        inhours_standby_secondary
+        inhours_standby
         oncall_primary
       ])
     end
@@ -127,9 +125,10 @@ RSpec.describe Person do
       expect { person.assign(role: :oncall_secondary, date: "08/04/2024") }.to raise_exception(ForbiddenRoleException)
     end
 
-    it "raises an error when assigning multiple supported roles on an available date" do
+    it "raises an error when assigning multiple supported roles on an available date (unless `force: true` is passed)" do
       expect { person.assign(role: :inhours_primary, date: "08/04/2024") }.not_to raise_exception
       expect { person.assign(role: :inhours_secondary, date: "08/04/2024") }.to raise_exception(MultipleRolesException)
+      expect { person.assign(role: :inhours_secondary, date: "08/04/2024", force: true) }.not_to raise_exception
     end
   end
 

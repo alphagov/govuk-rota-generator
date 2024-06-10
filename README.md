@@ -1,17 +1,12 @@
 # govuk-rota-generator
 
-Generates a balanced rota, taking into account each developer's availability and eligibility for different cover types.
+Generates a balanced rota, taking into account:
 
-There are some limitations to the generator, which we hope to resolve in future iterations:
-
-1. Currently no way of capping certain shift types.
-1. It doesn't account for different working patterns (e.g. devs who don't work Fridays currently have to find cover)
-1. The week is marked as 'unavailable' even if only one cover type is off limits. For example, a developer may say they're unavailable to do on-call at the weekend, but they would still be available to do in-hours shifts.
-1. It doesn't account for bank holidays.
-1. It doesn't account for team burden (i.e. there's nothing preventing it allocating multiple devs from the same team on one shift).
-1. It doesn't give a perfectly balanced rota (some devs will be allocated more slots than others), but a 'balancing' step after a first pass could be something we look at in future.
-
-We hope one day to make the rota generator think in terms of days rather than weeks, and also have tighter integration with the `pay-pagerduty` repo (e.g. merging together under a new name).
+1. Each developer's availability and eligibility for different cover types.
+1. Team burden (it avoids allocating multiple devs from the same team on one shift).
+1. Different working patterns (e.g. devs who don't work Fridays will automatically have cover assigned for that day).
+1. Partial availability (e.g. a developer may say they're unavailable to do on-call at the weekend, but they would still be available to do in-hours shifts - the generator will make use of that).
+1. Bank holiday support - it uses the [GOV.UK bank holiday API](https://www.gov.uk/bank-holidays.json) to detect bank holidays and ensure that the assigned on-call person that week is given the 'in-hours' shift in PagerDuty.
 
 ## Setup
 

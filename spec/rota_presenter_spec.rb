@@ -39,8 +39,8 @@ RSpec.describe RotaPresenter do
           01/04/2024,A,B
           02/04/2024,A,B
           03/04/2024,A,B
-          04/04/2024,A,B
-          05/04/2024,B,B
+          04/04/2024,A,C
+          05/04/2024,B,C
           06/04/2024,"",C
           07/04/2024,"",C
           08/04/2024,B,C
@@ -57,13 +57,13 @@ RSpec.describe RotaPresenter do
   end
 
   describe "#to_csv_weekly" do
-    it "outputs the rota as a CSV, grouped by week" do
+    it "outputs the rota as a CSV, grouped by week, each role showing the person with the most shifts that week (and daily overrides provided in parentheses)" do
       presenter = described_class.new(filepath: "#{File.dirname(__FILE__)}/fixtures/generated_rota.yml")
 
       expect(presenter.to_csv_weekly).to eq(
         <<~CSV.chomp,
           week,inhours_primary,oncall_primary
-          01/04/2024-07/04/2024,A (B on 05/04/2024),"B (C on 06/04/2024, C on 07/04/2024)"
+          01/04/2024-07/04/2024,A (B on 05/04/2024),"C (B on 01/04/2024, B on 02/04/2024, B on 03/04/2024)"
           08/04/2024-14/04/2024,B,C
 
         CSV
@@ -94,8 +94,8 @@ RSpec.describe RotaPresenter do
 
       expect(presenter.fairness_summary(roles_config:)).to eq(
         <<~OUTPUT.chomp,
-          C has 18 units of inconvenience, made up of 9 shifts including 9 oncall_primary.
-          B has 16 units of inconvenience, made up of 11 shifts including 5 oncall_primary, 6 inhours_primary.
+          C has 22 units of inconvenience, made up of 11 shifts including 11 oncall_primary.
+          B has 12 units of inconvenience, made up of 9 shifts including 3 oncall_primary, 6 inhours_primary.
           A has 4 units of inconvenience, made up of 4 shifts including 4 inhours_primary.
         OUTPUT
       )

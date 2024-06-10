@@ -35,7 +35,13 @@ RSpec.describe Algorithms::Weekly do
   let(:person_a) { Person.new(email: "a@a.com", team: "Foo", can_do_roles: %i[inhours_primary]) }
   let(:person_b) { Person.new(email: "b@b.com", team: "Bar", can_do_roles: %i[inhours_primary]) }
 
+  def stub_bank_holidays(bank_holidays = [])
+    allow(described_class).to receive(:bank_holiday_dates).and_return(bank_holidays)
+  end
+
   describe ".fill_slots!" do
+    before { stub_bank_holidays }
+
     it "groups the shifts on a weekly basis" do
       described_class.fill_slots!(dates:, people:, roles_config:)
       expect(person_a.assigned_shifts).to eq([
@@ -190,6 +196,63 @@ RSpec.describe Algorithms::Weekly do
         { date: "05/04/2024", role: :inhours_primary },
       ])
       expect(person_c.assigned_shifts).to eq([])
+    end
+  end
+
+  describe ".bank_holiday_dates" do
+    it "flags all of the bank holiday dates from the given list of dates" do
+      stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(
+        headers: { "Content-Type" => "application/json" },
+        body: {
+          "england-and-wales": {
+            "division": "england-and-wales",
+            "events": [
+              {
+                "title": "Early May bank holiday",
+                "date": "2024-05-06",
+                "notes": "",
+                "bunting": true,
+              },
+            ],
+          },
+        }.to_json,
+      )
+
+      dates = [
+        "05/05/2024",
+        "06/05/2024", # Bank Holiday
+        "07/05/2024",
+      ]
+      expect(described_class.bank_holiday_dates(dates)).to eq(["06/05/2024"])
+    end
+  end
+
+  describe ".override_bank_holiday_daytime_shifts" do
+    it "assigns the on-call person to the in-hours shift on bank holidays" do
+      bank_holiday = "06/05/2024"
+      stub_bank_holidays([bank_holiday])
+
+      inhours_a = Person.new(email: "i@a.com", team: "Foo", can_do_roles: %i[inhours_primary])
+      inhours_b = Person.new(email: "i@b.com", team: "Bar", can_do_roles: %i[inhours_secondary])
+      oncall_a = Person.new(email: "o@a.com", team: "Baz", can_do_roles: %i[oncall_primary inhours_primary])
+      oncall_b = Person.new(email: "o@b.com", team: "Bam", can_do_roles: %i[oncall_secondary inhours_secondary])
+      inhours_a.assign(role: :inhours_primary, date: bank_holiday)
+      inhours_b.assign(role: :inhours_secondary, date: bank_holiday)
+      oncall_a.assign(role: :oncall_primary, date: bank_holiday)
+      oncall_b.assign(role: :oncall_secondary, date: bank_holiday)
+      people = [inhours_a, inhours_b, oncall_a, oncall_b]
+
+      described_class.override_bank_holiday_daytime_shifts(people, [bank_holiday])
+      expect(inhours_a.assigned_shifts).to eq([])
+      expect(inhours_b.assigned_shifts).to eq([])
+      expect(oncall_a.assigned_shifts).to eq([
+        { date: bank_holiday, role: :oncall_primary },
+        { date: bank_holiday, role: :inhours_primary },
+      ])
+      expect(oncall_b.assigned_shifts).to eq([
+        { date: bank_holiday, role: :oncall_secondary },
+        { date: bank_holiday, role: :inhours_secondary },
+      ])
     end
   end
 end

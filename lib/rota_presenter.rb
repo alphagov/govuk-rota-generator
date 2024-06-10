@@ -62,7 +62,7 @@ class RotaPresenter
           end
 
           grouped = people_covering_role_this_week.group_by { |shift| shift[:name] }
-          name_of_person_with_most_shifts = grouped.keys.first
+          name_of_person_with_most_shifts = grouped.max { |a, b| a[1].count <=> b[1].count }[0]
           if grouped.count == 1
             name_of_person_with_most_shifts
           else

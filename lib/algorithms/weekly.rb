@@ -1,3 +1,5 @@
+require "httparty"
+require_relative "../data_processor"
 require_relative "../roles"
 
 module Algorithms
@@ -26,6 +28,7 @@ module Algorithms
         end
       end
       assign_stray_shifts(stray_shifts)
+      override_bank_holiday_daytime_shifts(people, dates)
     end
 
     def self.week_batches(dates)
@@ -104,6 +107,31 @@ module Algorithms
           person.assign(role:, date:)
         end
       end
+    end
+
+    def self.override_bank_holiday_daytime_shifts(people, dates)
+      bank_holiday_dates(dates).each do |date|
+        # TODO: it would be great to make this generic and not duplicate the role names here from the roles config,
+        # but we're stuck with the hack below because we're having to overwrite _two_ roles, and we want to do
+        # that somewhat consistently (i.e. oncall primary -> inhours primary, oncall secondary -> inhours secondary)
+        inhours_primary = people.find { |person| person.assigned_shifts.include?({ date:, role: :inhours_primary }) }
+        inhours_secondary = people.find { |person| person.assigned_shifts.include?({ date:, role: :inhours_secondary }) }
+        on_call_primary = people.find { |person| person.assigned_shifts.include?({ date:, role: :oncall_primary }) }
+        on_call_secondary = people.find { |person| person.assigned_shifts.include?({ date:, role: :oncall_secondary }) }
+
+        inhours_primary.unassign(role: :inhours_primary, date:)
+        inhours_secondary.unassign(role: :inhours_secondary, date:)
+        on_call_primary.assign(role: :inhours_primary, date:, force: true)
+        on_call_secondary.assign(role: :inhours_secondary, date:, force: true)
+      end
+    end
+
+    def self.bank_holiday_dates(dates)
+      bank_holidays = HTTParty.get("https://www.gov.uk/bank-holidays.json")
+      bank_holiday_dates = bank_holidays["england-and-wales"]["events"].map do |event|
+        DataProcessor.format_date(Date.parse(event["date"]))
+      end
+      dates & bank_holiday_dates
     end
 
     def self.inhours_role?(role_id)
