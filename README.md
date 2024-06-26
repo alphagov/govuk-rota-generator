@@ -78,7 +78,7 @@ Note that you can tweak the weighting of each 'role' (e.g. `oncall_primary`) by 
 
 Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`.
 
-This summarises the fairness of the rota at the "Auto-generated draft rota" worksheet you set up earlier.
+This summarises the fairness of the rota. It looks for a "Manually tweaked rota" worksheet, so you'll first need to copy the "Auto-generated draft rota" into a new "Manually tweaked rota" worksheet in the same spreadsheet, and copy over the data. This allows you to freely tweak the output of the rota, without worrying about losing all of your changes next time you run the rota generator.
 
 ### Synchronise the rota with PagerDuty
 
