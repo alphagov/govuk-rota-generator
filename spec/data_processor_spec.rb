@@ -88,7 +88,7 @@ RSpec.describe DataProcessor do
     end
 
     def mock_csv_headers(headers)
-      instance_double("Responses Data", headers:)
+      instance_double(Responses(Data, headers:))
     end
 
     it "raises an exception if columns are not in expected structure" do
@@ -103,7 +103,7 @@ RSpec.describe DataProcessor do
     end
 
     it "returns true if columns are in expected structure" do
-      expect(described_class.validate_responses(mock_csv_headers(valid_headers))).to eq(true)
+      expect(described_class.validate_responses(mock_csv_headers(valid_headers))).to be(true)
     end
 
     it "supports multiple 'Week commencing' columns" do
@@ -122,7 +122,7 @@ RSpec.describe DataProcessor do
         "Week commencing 24/06/2024",
       ]).flatten)
 
-      expect(described_class.validate_responses(responses_data)).to eq(true)
+      expect(described_class.validate_responses(responses_data)).to be(true)
     end
 
     it "raises an exception if the last column is missing" do
