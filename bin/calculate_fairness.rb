@@ -10,7 +10,7 @@ TMP_ROTA_YML = "#{File.dirname(__FILE__)}/../data/tmp_rota.yml".freeze
 roles_config = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
 
 puts "Fetching rota..."
-GoogleSheet.new.fetch(sheet_id: ROTA_SHEET_ID, range: "Auto-generated draft rota!A1:Z", filepath: TMP_ROTA_CSV)
+GoogleSheet.new.fetch(sheet_id: ROTA_SHEET_ID, range: "Manually tweaked rota!A1:Z", filepath: TMP_ROTA_CSV)
 puts "...downloaded to #{TMP_ROTA_CSV}."
 
 puts "Converting to YML..."
