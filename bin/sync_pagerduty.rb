@@ -61,10 +61,11 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
     end
 
     if pagerduty_shifts_to_override.empty?
-      puts "It was not possible to override #{shift_to_assign} for role #{role_id}."
-      puts "  This means that a past override has merged multiple distinct shifts (e.g. one unbroken shift from in-hours to on-call)."
-      puts "  The rota generator can't currently override 'parts' of an existing shift - it can only override the shift in its entirety."
-      puts "  You will therefore need to manually apply this shift in the PagerDuty UI."
+      # TODO: this means that a past override has merged multiple distinct shifts
+      # (e.g. one unbroken shift from in-hours to on-call). The rota generator can't
+      # currently override 'parts' of an existing shift - it can only override the
+      # shift in its entirety. It would be great to fix this in future.
+      puts "Warning: failed to assign #{shift_to_assign[:person].name} to the #{role_id} role from #{shift_to_assign[:start_datetime]} to #{shift_to_assign[:end_datetime]}. You'll need to apply this manually in the PagerDuty UI."
       next
     elsif pagerduty_shifts_to_override.count > 1
       puts "Overriding #{pagerduty_shifts_to_override.count} PagerDuty shifts for this shift."
