@@ -180,6 +180,62 @@ RSpec.describe PagerdutyClient do
     end
   end
 
+  describe "#shifts_assigned_to_wrong_person" do
+    it "returns the subset of shifts that need to be overridden" do
+      assigned_shifts_this_schedule = [
+        {
+          "start" => "2024-04-09T17:30:00+01:00",
+          "end" => "2024-04-10T09:30:00+01:00",
+          "user" => {
+            "id" => "PRTM7I8",
+            "summary" => "John",
+          },
+        },
+        {
+          "start" => "2024-04-11T17:30:00+01:00",
+          "end" => "2024-04-12T09:30:00+01:00",
+          "user" => {
+            "id" => "PRTM7I9",
+            "summary" => "Janice",
+          },
+        },
+      ]
+      john = Person.new(email: "John@example.com", team: "Foo", can_do_roles: %i[oncall_primary])
+      # This one is correctly assigned in `assigned_shifts_this_schedule`
+      already_assigned = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2024-04-09T17:30:00+01:00",
+        end_datetime: "2024-04-10T09:30:00+01:00",
+      }
+      # This shift is missing from `assigned_shifts_this_schedule`
+      missing = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2024-04-10T17:30:00+01:00",
+        end_datetime: "2024-04-11T09:30:00+01:00",
+      }
+      # This shift is assigned to the wrong person in `assigned_shifts_this_schedule`
+      incorrectly_assigned = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2024-04-11T17:30:00+01:00",
+        end_datetime: "2024-04-12T09:30:00+01:00",
+      }
+      shifts_to_assign = [
+        already_assigned,
+        missing,
+        incorrectly_assigned,
+      ]
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)).to eq([
+        missing,
+        incorrectly_assigned,
+      ])
+    end
+  end
+
   describe "#create_override" do
     it "sends an override request to PagerDuty" do
       schedule_id = "P999ABC"

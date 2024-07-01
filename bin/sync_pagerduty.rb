@@ -39,20 +39,13 @@ people.compact!
 
 Roles.new.pagerduty_roles.each do |role_id, role_config|
   puts "Processing #{role_id} shifts..."
+
+  schedule_id = role_config[:pagerduty][:schedule_id]
   shifts_to_assign = people.map do |person|
     person.formatted_shifts(role_id).map { |shift| { person:, **shift } }
   end
-
-  schedule_id = role_config[:pagerduty][:schedule_id]
   assigned_shifts_this_schedule = pd.assigned_shifts_this_schedule(schedule_id, rota[:dates].first, rota[:dates].last)
-
-  shifts_to_overwrite = shifts_to_assign.flatten.reject do |shift_to_assign|
-    currently_assigned = assigned_shifts_this_schedule.find do |existing_shift|
-      existing_shift["start"] == shift_to_assign[:start_datetime] &&
-        existing_shift["end"] == shift_to_assign[:end_datetime]
-    end
-    currently_assigned && currently_assigned["user"]["summary"] == shift_to_assign[:person].name # person already assigned to this slot
-  end
+  shifts_to_overwrite = pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)
 
   puts "Overriding #{shifts_to_overwrite.count} individual shifts in PagerDuty..."
   shifts_to_overwrite.each do |shift_to_assign|

@@ -49,6 +49,16 @@ class PagerdutyClient
     )["schedule"]["final_schedule"]["rendered_schedule_entries"]
   end
 
+  def shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)
+    shifts_to_assign.flatten.reject do |shift_to_assign|
+      currently_assigned = assigned_shifts_this_schedule.find do |existing_shift|
+        existing_shift["start"] == shift_to_assign[:start_datetime] &&
+          existing_shift["end"] == shift_to_assign[:end_datetime]
+      end
+      currently_assigned && currently_assigned["user"]["summary"] == shift_to_assign[:person].name # person already assigned to this slot
+    end
+  end
+
   def create_override(schedule_id, pagerduty_user_id, start_datetime, end_datetime)
     override = {
       override: {
