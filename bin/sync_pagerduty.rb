@@ -44,11 +44,12 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
   end
 
   schedule_id = role_config[:pagerduty][:schedule_id]
-  assigned_shifts_this_schedule = pd.schedule(schedule_id, rota[:dates].first, rota[:dates].last)
+  assigned_shifts_this_schedule = pd.schedule(schedule_id, rota[:dates].first, (Time.zone.parse(rota[:dates].last) + 9.5.hours).iso8601)
 
   shifts_to_overwrite = shifts_to_assign.flatten.reject do |shift_to_assign|
     currently_assigned = assigned_shifts_this_schedule.find do |existing_shift|
-      existing_shift["start"] == shift_to_assign[:start_datetime]
+      existing_shift["start"] == shift_to_assign[:start_datetime] &&
+        existing_shift["end"] == shift_to_assign[:end_datetime]
     end
     currently_assigned && currently_assigned["user"]["summary"] == shift_to_assign[:person].name # person already assigned to this slot
   end
