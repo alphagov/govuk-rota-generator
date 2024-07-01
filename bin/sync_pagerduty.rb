@@ -63,7 +63,7 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
       # so we're getting this message. Would be great to fix this in future.
       puts "Warning: failed to assign #{shift_to_assign[:person].name} to the #{role_id} role from #{shift_to_assign[:start_datetime]} to #{shift_to_assign[:end_datetime]}. You'll need to apply this manually in the PagerDuty UI."
       next
-    elsif pagerduty_shifts_to_override.count > 1
+    elsif pagerduty_shifts_to_override.count.positive?
       puts "Overriding #{pagerduty_shifts_to_override.count} PagerDuty shifts for this shift."
     end
 
