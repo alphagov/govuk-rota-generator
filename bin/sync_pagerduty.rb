@@ -62,12 +62,7 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
     end
 
     if pagerduty_shifts_to_override.empty?
-      # TODO: this means that a past override has merged multiple distinct shifts
-      # (e.g. one unbroken shift from in-hours to on-call). The rota generator can't
-      # currently override 'parts' of an existing shift - it can only override the
-      # shift in its entirety. It would be great to fix this in future.
-      #
-      # TODO: this message also happens when someone has two distinct back-to-back
+      # TODO: this message can happen when someone has two distinct back-to-back
       # shifts, e.g. someone covering bank holiday may have inhours_primary 9:30-17:30
       # followed by oncall_primary 17:30-9:30. PagerDuty API returns this as one
       # 9:30-9:30 shift, which doesn't match our internal representation of two shifts,
@@ -79,6 +74,16 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
     end
 
     pagerduty_shifts_to_override.each do |existing|
+      # Sometimes, for whatever reason, part of a long shift has already been assigned to the right user.
+      # e.g. a 17:30 Friday -> 09:30 Monday, where perhaps the correct person is assigned apart from for
+      # the 09:30 Sunday -> 09:30 Monday slot. In this case, the start/end times for the person's shift
+      # don't match and so all of the composite parts of the shift are included in
+      # `pagerduty_shifts_to_override`. We can safely skip over the correctly assigned shifts and just
+      # let the one 'bad' shift get prompted and overwritten. On subsequent runs of the script, the
+      # entire shift would no longer be included in `pagerduty_shifts_to_override`, as the start/end
+      # timestamps would now match.
+      next if shift_to_assign[:person].name == existing["user"]["summary"]
+
       puts "Set #{shift_to_assign[:person].name} as the #{role_id} from #{shift_to_assign[:start_datetime]}-#{shift_to_assign[:end_datetime]} (replacing #{existing['user']['summary']})? y/n/exit"
 
       valid_action = false
