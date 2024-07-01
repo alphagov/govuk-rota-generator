@@ -34,10 +34,11 @@ class PagerdutyClient
     users.flatten
   end
 
-  def schedule(schedule_id, from_date, to_date)
-    since_datetime = Time.zone.parse(from_date).iso8601
-    until_datetime = (Time.zone.parse(to_date) + 1.day).iso8601
+  def assigned_shifts_this_schedule(schedule_id, from_date, to_date)
+    schedule(schedule_id, Time.zone.parse(from_date).iso8601, (Time.zone.parse(to_date) + 1.day + 9.5.hours).iso8601)
+  end
 
+  def schedule(schedule_id, since_datetime, until_datetime)
     HTTParty.get(
       "https://api.pagerduty.com/schedules/#{schedule_id}?since=#{since_datetime}&until=#{until_datetime}",
       headers: {

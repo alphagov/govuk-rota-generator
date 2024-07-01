@@ -62,11 +62,27 @@ RSpec.describe PagerdutyClient do
     end
   end
 
+  describe "#assigned_shifts_this_schedule" do
+    it "figures out the timestamp for 9:30am the day after the last day of the rota, and passes that to #schedule" do
+      pd = described_class.new(api_token: "foo")
+      schedule_id = "schedule_id"
+      from_date = "01/01/1970"
+      to_date = "02/01/1970"
+      formatted_from_date = "1970-01-01T00:00:00+01:00"
+      manipulated_to_date = "1970-01-03T09:30:00+01:00"
+      return_value = "bar"
+
+      allow(pd).to receive(:schedule).with(schedule_id, formatted_from_date, manipulated_to_date).and_return(return_value)
+      expect(pd).to receive(:schedule).with(schedule_id, formatted_from_date, manipulated_to_date)
+      expect(pd.assigned_shifts_this_schedule(schedule_id, from_date, to_date)).to eq(return_value)
+    end
+  end
+
   describe "#schedule" do
     it "retrieves a specific schedule between two dates" do
       schedule_id = "P999ABC"
-      from_date = "01/04/2024"
-      to_date = "07/04/2024"
+      from_date = "2024-04-01T00:00:00+01:00"
+      to_date = "2024-04-08T00:00:00+01:00"
       rendered_schedule_entries = [
         {
           # on-call person 'carried over' from previous week

@@ -44,7 +44,7 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
   end
 
   schedule_id = role_config[:pagerduty][:schedule_id]
-  assigned_shifts_this_schedule = pd.schedule(schedule_id, rota[:dates].first, (Time.zone.parse(rota[:dates].last) + 9.5.hours).iso8601)
+  assigned_shifts_this_schedule = pd.assigned_shifts_this_schedule(schedule_id, rota[:dates].first, rota[:dates].last)
 
   shifts_to_overwrite = shifts_to_assign.flatten.reject do |shift_to_assign|
     currently_assigned = assigned_shifts_this_schedule.find do |existing_shift|
