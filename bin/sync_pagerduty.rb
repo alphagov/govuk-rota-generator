@@ -49,10 +49,11 @@ Roles.new.pagerduty_roles.each do |role_id, role_config|
 
   puts "Overriding #{shifts_to_overwrite.count} individual shifts in PagerDuty..."
   shifts_to_overwrite.each do |shift_to_assign|
-    pagerduty_shifts_to_override = assigned_shifts_this_schedule.select do |shift|
-      Time.zone.parse(shift["start"]) >= Time.zone.parse(shift_to_assign[:start_datetime]) &&
-        Time.zone.parse(shift["end"]) <= Time.zone.parse(shift_to_assign[:end_datetime])
-    end
+    pagerduty_shifts_to_override = pd.shifts_within_timespan(
+      shift_to_assign[:start_datetime],
+      shift_to_assign[:end_datetime],
+      assigned_shifts_this_schedule,
+    )
 
     if pagerduty_shifts_to_override.empty?
       # TODO: this message can happen when someone has two distinct back-to-back

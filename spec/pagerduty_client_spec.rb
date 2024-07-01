@@ -236,6 +236,37 @@ RSpec.describe PagerdutyClient do
     end
   end
 
+  describe "#shifts_within_timespan" do
+    it "returns the range of PagerDuty shifts covered by the start/end datetime" do
+      first_pd_shift = {
+        "start" => "2024-04-01T17:30:00+01:00",
+        "end" => "2024-04-02T09:30:00+01:00",
+      }
+      second_pd_shift = {
+        "start" => "2024-04-02T09:30:00+01:00",
+        "end" => "2024-04-02T17:30:00+01:00",
+      }
+      third_pd_shift = {
+        "start" => "2024-04-02T17:30:00+01:00",
+        "end" => "2024-04-03T09:30:00+01:00",
+      }
+      existing_pagerduty_shifts = [
+        first_pd_shift,
+        second_pd_shift,
+        third_pd_shift,
+      ]
+
+      start_datetime = "2024-04-01T17:30:00+01:00"
+      end_datetime = "2024-04-02T17:30:00+01:00"
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)).to eq([
+        first_pd_shift,
+        second_pd_shift,
+      ])
+    end
+  end
+
   describe "#create_override" do
     it "sends an override request to PagerDuty" do
       schedule_id = "P999ABC"

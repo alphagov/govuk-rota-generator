@@ -59,6 +59,13 @@ class PagerdutyClient
     end
   end
 
+  def shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)
+    existing_pagerduty_shifts.select do |shift|
+      Time.zone.parse(shift["start"]) >= Time.zone.parse(start_datetime) &&
+        Time.zone.parse(shift["end"]) <= Time.zone.parse(end_datetime)
+    end
+  end
+
   def create_override(schedule_id, pagerduty_user_id, start_datetime, end_datetime)
     override = {
       override: {
