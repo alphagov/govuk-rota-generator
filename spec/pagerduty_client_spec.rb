@@ -62,11 +62,27 @@ RSpec.describe PagerdutyClient do
     end
   end
 
+  describe "#assigned_shifts_this_schedule" do
+    it "figures out the timestamp for 9:30am the day after the last day of the rota, and passes that to #schedule" do
+      pd = described_class.new(api_token: "foo")
+      schedule_id = "schedule_id"
+      from_date = "01/01/1970"
+      to_date = "02/01/1970"
+      formatted_from_date = "1970-01-01T00:00:00+01:00"
+      manipulated_to_date = "1970-01-03T09:30:00+01:00"
+      return_value = "bar"
+
+      allow(pd).to receive(:schedule).with(schedule_id, formatted_from_date, manipulated_to_date).and_return(return_value)
+      expect(pd).to receive(:schedule).with(schedule_id, formatted_from_date, manipulated_to_date)
+      expect(pd.assigned_shifts_this_schedule(schedule_id, from_date, to_date)).to eq(return_value)
+    end
+  end
+
   describe "#schedule" do
     it "retrieves a specific schedule between two dates" do
       schedule_id = "P999ABC"
-      from_date = "01/04/2024"
-      to_date = "07/04/2024"
+      from_date = "2024-04-01T00:00:00+01:00"
+      to_date = "2024-04-08T00:00:00+01:00"
       rendered_schedule_entries = [
         {
           # on-call person 'carried over' from previous week
@@ -161,6 +177,93 @@ RSpec.describe PagerdutyClient do
 
       pd = described_class.new(api_token: "foo")
       expect(pd.schedule(schedule_id, from_date, to_date).to_json).to eq(rendered_schedule_entries.to_json)
+    end
+  end
+
+  describe "#shifts_assigned_to_wrong_person" do
+    it "returns the subset of shifts that need to be overridden" do
+      assigned_shifts_this_schedule = [
+        {
+          "start" => "2024-04-09T17:30:00+01:00",
+          "end" => "2024-04-10T09:30:00+01:00",
+          "user" => {
+            "id" => "PRTM7I8",
+            "summary" => "John",
+          },
+        },
+        {
+          "start" => "2024-04-11T17:30:00+01:00",
+          "end" => "2024-04-12T09:30:00+01:00",
+          "user" => {
+            "id" => "PRTM7I9",
+            "summary" => "Janice",
+          },
+        },
+      ]
+      john = Person.new(email: "John@example.com", team: "Foo", can_do_roles: %i[oncall_primary])
+      # This one is correctly assigned in `assigned_shifts_this_schedule`
+      already_assigned = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2024-04-09T17:30:00+01:00",
+        end_datetime: "2024-04-10T09:30:00+01:00",
+      }
+      # This shift is missing from `assigned_shifts_this_schedule`
+      missing = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2024-04-10T17:30:00+01:00",
+        end_datetime: "2024-04-11T09:30:00+01:00",
+      }
+      # This shift is assigned to the wrong person in `assigned_shifts_this_schedule`
+      incorrectly_assigned = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2024-04-11T17:30:00+01:00",
+        end_datetime: "2024-04-12T09:30:00+01:00",
+      }
+      shifts_to_assign = [
+        already_assigned,
+        missing,
+        incorrectly_assigned,
+      ]
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)).to eq([
+        missing,
+        incorrectly_assigned,
+      ])
+    end
+  end
+
+  describe "#shifts_within_timespan" do
+    it "returns the range of PagerDuty shifts covered by the start/end datetime" do
+      first_pd_shift = {
+        "start" => "2024-04-01T17:30:00+01:00",
+        "end" => "2024-04-02T09:30:00+01:00",
+      }
+      second_pd_shift = {
+        "start" => "2024-04-02T09:30:00+01:00",
+        "end" => "2024-04-02T17:30:00+01:00",
+      }
+      third_pd_shift = {
+        "start" => "2024-04-02T17:30:00+01:00",
+        "end" => "2024-04-03T09:30:00+01:00",
+      }
+      existing_pagerduty_shifts = [
+        first_pd_shift,
+        second_pd_shift,
+        third_pd_shift,
+      ]
+
+      start_datetime = "2024-04-01T17:30:00+01:00"
+      end_datetime = "2024-04-02T17:30:00+01:00"
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)).to eq([
+        first_pd_shift,
+        second_pd_shift,
+      ])
     end
   end
 
