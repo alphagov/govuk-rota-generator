@@ -22,7 +22,9 @@ class DataProcessor
   def self.create_people_from_csv_data(people_data, responses_data)
     validate_responses(responses_data)
 
-    people_data.map do |person_data|
+    people = people_data.map do |person_data|
+      next unless person_data["Email"]
+
       email = person_data["Email"]
       response_data = responses_data.find { |response| email == response["Email address"] }
       week_commencing_fields = []
@@ -51,16 +53,18 @@ class DataProcessor
           forbidden_dates.empty? ? nil : forbidden_dates
         }.compact.flatten,
         can_do_roles: [
-          person_data["Eligible for in-hours primary?"] == "Yes" ? :inhours_primary : nil,
-          person_data["Can do in-hours secondary?"] == "Yes" ? :inhours_secondary : nil,
-          person_data["Can do in-hours secondary?"] == "Yes" ? :inhours_standby : nil,
-          person_data["Should be scheduled for on-call?"] == "Yes" && person_data["Eligible for on-call primary?"] == "Yes" ? :oncall_primary : nil,
-          person_data["Should be scheduled for on-call?"] == "Yes" && person_data["Eligible for on-call secondary?"] == "Yes" ? :oncall_secondary : nil,
+          person_data["Eligible for in-hours Primary?"] == "Yes" ? :inhours_primary : nil,
+          person_data["Eligible for in-hours Secondary?"] == "Yes" ? :inhours_secondary : nil,
+          person_data["Eligible for in-hours Secondary?"] == "Yes" ? :inhours_standby : nil,
+          person_data["Eligible for on-call Primary?"] == "Yes" ? :oncall_primary : nil,
+          person_data["Eligible for on-call Secondary?"] == "Yes" ? :oncall_secondary : nil,
         ].compact,
       }
 
       Person.new(**person_args)
     end
+
+    people.compact
   end
 
   def self.non_working_days(comma_separated_days)

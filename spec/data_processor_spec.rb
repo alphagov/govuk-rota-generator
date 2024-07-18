@@ -19,8 +19,8 @@ RSpec.describe DataProcessor do
   describe ".create_people_from_csv_data" do
     it "combines two CSV parsed inputs into one array of Person" do
       people_data = CSV.parse(<<~CSV, headers: true)
-        Email,Eligible for in-hours primary?,Can do in-hours secondary?,Eligible for on-call primary?,Eligible for on-call secondary?,Should be scheduled for on-call?
-        a@a.com,Yes,Yes,Yes,Yes,Yes
+        Email,Eligible for in-hours Primary?,Eligible for in-hours Secondary?,Eligible for on-call Primary?,Eligible for on-call Secondary?
+        a@a.com,Yes,Yes,Yes,Yes
       CSV
       responses_data = CSV.parse(<<~CSV, headers: true)
         Timestamp,Email address,Have you been given an exemption from on call?,Do you have any non working days? [Non working day(s)],What team/area are you in (or will be in when this rota starts)?,"If you work different hours to the 9.30am-5.30pm 2nd line shifts, please state your hours",Week commencing 01/04/2024,Week commencing 08/04/2024,Need to elaborate on any of the above?
@@ -47,8 +47,8 @@ RSpec.describe DataProcessor do
 
     it "assumes availability if the person hasn't provided availability responses" do
       people_data = CSV.parse(<<~CSV, headers: true)
-        Email,Eligible for in-hours primary?,Can do in-hours secondary?,Eligible for on-call primary?,Eligible for on-call secondary?,Should be scheduled for on-call?
-        a@a.com,Yes,Yes,Yes,Yes,Yes
+        Email,Eligible for in-hours Primary?,Eligible for in-hours Secondary?,Eligible for on-call Primary?,Eligible for on-call Secondary?
+        a@a.com,Yes,Yes,Yes,Yes
       CSV
       responses_data = CSV.parse(<<~CSV, headers: true)
         Timestamp,Email address,Have you been given an exemption from on call?,Do you have any non working days? [Non working day(s)],What team/area are you in (or will be in when this rota starts)?,"If you work different hours to the 9.30am-5.30pm 2nd line shifts, please state your hours",Week commencing 01/04/2024,Week commencing 08/04/2024,Need to elaborate on any of the above?
@@ -70,6 +70,19 @@ RSpec.describe DataProcessor do
       })
 
       described_class.create_people_from_csv_data(people_data, responses_data)
+    end
+
+    it "skips over any entries that are incomplete" do
+      people_data = CSV.parse(<<~CSV, headers: true)
+        Eligible for in-hours Primary?,Eligible for in-hours Secondary?,Eligible for on-call Primary?,Eligible for on-call Secondary?,Email,Some other field,Some other field again
+        Yes,Yes,Yes,Yes,a@a.com,foo,foo
+        No,No,No,No
+      CSV
+      responses_data = CSV.parse(<<~CSV, headers: true)
+        Timestamp,Email address,Have you been given an exemption from on call?,Do you have any non working days? [Non working day(s)],What team/area are you in (or will be in when this rota starts)?,"If you work different hours to the 9.30am-5.30pm 2nd line shifts, please state your hours",Week commencing 01/04/2024,Week commencing 08/04/2024,Need to elaborate on any of the above?
+      CSV
+
+      expect { described_class.create_people_from_csv_data(people_data, responses_data) }.not_to raise_exception
     end
   end
 
