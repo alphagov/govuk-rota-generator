@@ -35,7 +35,7 @@ Run the `fetch_data` script, passing the URL of your responses spreadsheet as a 
 
 `ruby bin/fetch_data.rb https://docs.google.com/spreadsheets/d/abc123def456hij789/edit`
 
-This will generate a `data/rota_inputs.yml` file, combining your responses spreadsheet with the [Technical Support Google Sheet](https://docs.google.com/spreadsheets/d/1OTVm_k6MDdCFN1EFzrKXWu4iIPI7uR9mssI8AMwn7lU/edit#gid=1249170615).
+This will generate a `data/rota_inputs.yml` file, combining your responses spreadsheet with the 'Eligibility' sheet of the [List of GOV.UK Engineers](https://docs.google.com/spreadsheets/d/1uLW-T7VtGE4YKdCvzOvmq2KoeXgZMv-HOpt70HQnEcU/edit) (accessible by Senior Tech and 2nd Line Leads only).
 
 The generated file will look something like:
 
