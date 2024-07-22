@@ -18,7 +18,9 @@ RSpec.describe PagerdutyClient do
 
   describe ".initialize" do
     it "takes an API token" do
-      described_class.new(api_token: "foo")
+      client = described_class.new(api_token: "foo")
+
+      expect(client).to be_instance_of(described_class)
     end
 
     it "raises an error if token is nil" do
