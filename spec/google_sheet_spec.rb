@@ -2,7 +2,7 @@ require "google_sheet"
 
 RSpec.describe GoogleSheet do
   before do
-    mock_authorizer = instance_double("Google Authorizer", fetch_access_token!: true)
+    mock_authorizer = double("Google Authorizer", fetch_access_token!: true) # rubocop:disable RSpec/VerifiedDoubles
     allow(Google::Auth::ServiceAccountCredentials).to receive(:make_creds).and_return(mock_authorizer)
     allow(File).to receive(:open).with("./google_service_account_key.json").and_return("{}")
   end
@@ -67,7 +67,7 @@ RSpec.describe GoogleSheet do
 
     it "raises GoogleException if exception is encountered upstream" do
       error = { "error" => "Permissions issue" }
-      mock_exception = instance_double("Google Sheet Exception", body: error.to_json)
+      mock_exception = double("Google Sheet Exception", body: error.to_json) # rubocop:disable RSpec/VerifiedDoubles
       allow(mock_sheets_api).to receive(:batch_clear_values).and_yield(nil, mock_exception)
       expect { described_class.new(sheets_api: mock_sheets_api).write(sheet_id:, range:, csv: "foo,bar,baz") }.to raise_exception(GoogleSheetException)
     end
