@@ -47,7 +47,7 @@ RSpec.describe Person do
 
   describe "#pagerduty_user_id" do
     it "can get and set a pagerduty_user_id" do
-      expect(person.pagerduty_user_id).to eq(nil)
+      expect(person.pagerduty_user_id).to be_nil
       person.pagerduty_user_id = "foo"
       expect(person.pagerduty_user_id).to eq("foo")
     end
@@ -72,12 +72,12 @@ RSpec.describe Person do
 
   describe "#can_do_role?" do
     it "returns `true` for roles that the person can do" do
-      expect(person.can_do_role?(:inhours_primary)).to eq(true)
-      expect(person.can_do_role?(:inhours_standby)).to eq(true)
+      expect(person.can_do_role?(:inhours_primary)).to be(true)
+      expect(person.can_do_role?(:inhours_standby)).to be(true)
     end
 
     it "returns `false` for roles that the person cannot do" do
-      expect(person.can_do_role?(:oncall_secondary)).to eq(false)
+      expect(person.can_do_role?(:oncall_secondary)).to be(false)
     end
   end
 

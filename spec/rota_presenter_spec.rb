@@ -3,14 +3,20 @@ require "rota_presenter"
 RSpec.describe RotaPresenter do
   describe "#initialize" do
     it "can take a filepath and roles arg" do
-      described_class.new(filepath: "#{File.dirname(__FILE__)}/fixtures/generated_rota.yml")
+      rota_presenter = described_class.new(
+        filepath: "#{File.dirname(__FILE__)}/fixtures/generated_rota.yml",
+      )
+
+      expect(rota_presenter).to be_instance_of(described_class)
     end
 
     it "can take dates, people and roles directly" do
-      described_class.new(
+      rota_presenter = described_class.new(
         dates: ["01/04/2024"],
         people: [Person.new(email: "a@a.com", team: "Foo", can_do_roles: [])],
       )
+
+      expect(rota_presenter).to be_instance_of(described_class)
     end
 
     it "raises an exception if invalid parameters provided" do
