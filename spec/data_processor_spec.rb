@@ -101,7 +101,7 @@ RSpec.describe DataProcessor do
     end
 
     def mock_csv_headers(headers)
-      instance_double("Responses Data", headers:)
+      instance_double("CSV::Table", headers:)
     end
 
     it "raises an exception if columns are not in expected structure" do
