@@ -14,11 +14,6 @@ inhours_secondary:
   pagerduty:
     schedule_name: GOV.UK Secondary (2nd Call)
     schedule_id: P752O37
-inhours_standby:
-  value: 0.9
-  weekdays: true
-  weeknights: false
-  weekends: false
 oncall_primary:
   value: 1
   weekdays: false
