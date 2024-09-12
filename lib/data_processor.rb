@@ -55,7 +55,6 @@ class DataProcessor
         can_do_roles: [
           person_data["Eligible for in-hours Primary?"] == "Yes" ? :inhours_primary : nil,
           person_data["Eligible for in-hours Secondary?"] == "Yes" ? :inhours_secondary : nil,
-          person_data["Eligible for in-hours Secondary?"] == "Yes" ? :inhours_standby : nil,
           person_data["Eligible for on-call Primary?"] == "Yes" ? :oncall_primary : nil,
           person_data["Eligible for on-call Secondary?"] == "Yes" ? :oncall_secondary : nil,
         ].compact,

@@ -36,7 +36,6 @@ RSpec.describe DataProcessor do
         can_do_roles: %i[
           inhours_primary
           inhours_secondary
-          inhours_standby
           oncall_primary
           oncall_secondary
         ],
@@ -63,7 +62,6 @@ RSpec.describe DataProcessor do
         can_do_roles: %i[
           inhours_primary
           inhours_secondary
-          inhours_standby
           oncall_primary
           oncall_secondary
         ],
