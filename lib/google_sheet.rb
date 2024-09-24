@@ -5,6 +5,12 @@ require "json"
 
 class GoogleSheetException < StandardError; end
 
+class Tmp
+  def read
+    ENV.fetch("GOOGLE_SERVICE_ACCOUNT_KEY")
+  end
+end
+
 class GoogleSheet
   def initialize(sheets_api: Google::Apis::SheetsV4::SheetsService.new, scope: :read)
     # https://developers.google.com/identity/protocols/oauth2/scopes#script
@@ -15,7 +21,7 @@ class GoogleSheet
             end
 
     authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      json_key_io: ENV.fetch("GOOGLE_SERVICE_ACCOUNT_KEY") ? double("file", read: ENV.fetch("GOOGLE_SERVICE_ACCOUNT_KEY")) : File.open("./google_service_account_key.json"),
+      json_key_io: ENV.fetch("GOOGLE_SERVICE_ACCOUNT_KEY") ? Tmp.new : File.open("./google_service_account_key.json"),
       scope:,
     )
     authorizer.fetch_access_token!
