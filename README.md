@@ -94,23 +94,22 @@ You'll need a PagerDuty API key associated with PagerDuty account that has "Glob
 1. Click on "User Settings"
 1. Click "Create API User Token"
 
-Export this token as an ENV variable:
-
-```sh
-export PAGER_DUTY_API_KEY=$(more ~/pagerduty_token.txt)
-```
+Store this token somewhere safe, e.g. `~/pagerduty_token.txt`.
 
 #### Run the synchroniser script
 
 You can now synchronise a rota with PagerDuty using:
 
 ```sh
-ruby bin/sync_pagerduty.rb
+$ export ROTA_SHEET_URL="https://docs.google.com/spreadsheets/d/<sheet id>/edit"
+$ export ROTA_TAB_NAME="Q3 24/25 Rota"                                                                            
+$ export PAGER_DUTY_API_KEY=$(more ~/pagerduty_token.txt)
+$ bundle exec rake sync_pagerduty[false]
 ```
 
 This will:
 
-1. Use the rota in `data/tmp_rota.yml` (created automatically by the "calculate fairness" script)
+1. Fetch the rota corresponding to `ROTA_SHEET_URL` and `ROTA_TAB_NAME`
 1. Map the roles in that rota to the roles in `config/roles.yml`, where it finds the corresponding PagerDuty schedule IDs
 1. Fetch the list of PagerDuty users and match these up with the users in your rota, warning on any names that are missing from PagerDuty (and skipping over those shifts)±
 1. Find conflicts between the PagerDuty schedule and the local rota, and apply overrides to fix them
@@ -119,8 +118,8 @@ This will:
 
 By default, the script will ask you to approve each override: `y` to override, `n` to skip, and `exit` to close the script altogether. This means you can do a 'dry run' of the synchroniser by choosing `n` each time.
 
-If you wish to approve all of the overrides at once, you can pass the `--bulk` option:
+If you wish to approve all of the overrides at once, you can pass `true` to the rake task:
 
 ```sh
-ruby bin/sync_pagerduty.rb --bulk
+bundle exec rake sync_pagerduty[true]
 ```

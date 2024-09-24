@@ -1,0 +1,30 @@
+name: "Synchronise rota with PagerDuty"
+
+on:
+  # TODO: uncomment the below once we've tested the script is working
+  # schedule:
+  #   - cron:  '0 8 * * *'
+  workflow_dispatch: {}
+  # TODO: remove the below - we only want to run the workflow on push while we're testing the logic
+  push:
+    branches: [sync-pagerduty-on-cron]
+
+jobs:
+  sync-pagerduty:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Synchronise PagerDuty
+        run: bundle exec rake sync_pagerduty[true]
+        env:
+          GOOGLE_SERVICE_ACCOUNT_KEY : ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          PAGER_DUTY_API_KEY: ${{ secrets.PAGER_DUTY_API_KEY }}
+          ROTA_SHEET_URL: ${{ secrets.ROTA_SHEET_URL }}
+          ROTA_TAB_NAME: ${{ secrets.ROTA_TAB_NAME }}
