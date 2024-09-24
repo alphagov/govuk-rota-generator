@@ -1,0 +1,27 @@
+name: "Synchronise rota with PagerDuty"
+
+on:
+  # TODO: uncomment the blow once we've tested the script is working
+  # schedule:
+  #   - cron:  '0 8 * * *'
+  workflow_dispatch: {}
+  # TODO: remove the below - we only want to run the workflow on push while we're testing the logic
+  push:
+    branches: [run-pagerduty-sync-on-cron]
+
+jobs:
+  sync-pagerduty:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Configure GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: bundle exec bin/sync_pagerduty_cron.rb
