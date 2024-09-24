@@ -15,7 +15,7 @@ class GoogleSheet
             end
 
     authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      json_key_io: File.open("./google_service_account_key.json"),
+      json_key_io: ENV.fetch("GOOGLE_SERVICE_ACCOUNT_KEY") || File.open("./google_service_account_key.json"),
       scope:,
     )
     authorizer.fetch_access_token!
