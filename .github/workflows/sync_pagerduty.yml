@@ -22,7 +22,7 @@ jobs:
           bundler-cache: true
 
       - name: Synchronise PagerDuty
-        run: bundle exec rake
+        run: mkdir ./data && bundle exec rake
         env:
           GOOGLE_SERVICE_ACCOUNT_KEY : ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
           PAGER_DUTY_API_KEY: ${{ secrets.PAGER_DUTY_API_KEY }}
