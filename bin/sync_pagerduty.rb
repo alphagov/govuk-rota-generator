@@ -13,6 +13,8 @@ TMP_ROTA_YML = "#{File.dirname(__FILE__)}/../data/tmp_rota.yml".freeze
 
 class SyncPagerduty
   def execute(bulk_apply_overrides: false)
+    errors_found = false
+
     roles_config = YAML.load_file("#{File.dirname(__FILE__)}/../config/roles.yml", symbolize_names: true)
 
     puts "Fetching rota..."
@@ -51,6 +53,7 @@ class SyncPagerduty
         person
       else
         puts "No PagerDuty user found for '#{person.name}' (do they have Production Admin access?). Skipping overriding their shifts..."
+        errors_found = true
         nil
       end
     end
@@ -81,6 +84,7 @@ class SyncPagerduty
           # 9:30-9:30 shift, which doesn't match our internal representation of two shifts,
           # so we're getting this message. Would be great to fix this in future.
           puts "Warning: failed to assign #{shift_to_assign[:person].name} to the #{role_id} role from #{shift_to_assign[:start_datetime]} to #{shift_to_assign[:end_datetime]}. You'll need to apply this manually in the PagerDuty UI."
+          errors_found = true
           next
         elsif pagerduty_shifts_to_override.count.positive?
           puts "Overriding #{pagerduty_shifts_to_override.count} PagerDuty shifts for this shift."
@@ -119,6 +123,7 @@ class SyncPagerduty
             if response.code == 400
               puts "...error applying override."
               puts response.body
+              errors_found = true
             else
               puts "...overwrite applied!"
             end
@@ -131,6 +136,11 @@ class SyncPagerduty
         end
       end
       puts "Finished overriding #{role_id} shifts."
+    end
+
+    if errors_found
+      puts "PagerDuty wasn't able to fully synchronise. See output above."
+      exit 1
     end
   end
 end
