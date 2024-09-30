@@ -1,9 +1,9 @@
 name: "Synchronise rota with PagerDuty"
 
 on:
-  # TODO: uncomment the below once we've tested the script is working
-  # schedule:
-  #   - cron:  '0 8 * * *'
+  schedule:
+    # synchronise PagerDuty every hour (8pm-6pm) during the working week
+    - cron:  '0 8-18 * * 1-5'
   workflow_dispatch: {}
   # TODO: remove the below - we only want to run the workflow on push while we're testing the logic
   push:

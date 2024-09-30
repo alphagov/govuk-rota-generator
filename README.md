@@ -85,6 +85,14 @@ Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc12
 
 ### Synchronise the rota with PagerDuty
 
+govuk-rota-generator automatically synchronises the Google Sheet rota with PagerDuty [on a regular basis](.github/workflows/sync_pagerduty.yml).
+
+The three ENV vars described in [Run the synchroniser script](#run-the-synchroniser-script), as well as the `GOOGLE_SERVICE_ACCOUNT_KEY` key from the [setup](#setup) phase, are stored as secrets on this repository.
+
+Every quarter, a developer will need to swap out the `ROTA_TAB_NAME` to reflect the name of the next rota that needs synchronising.
+
+Below are the instructions for running the synchroniser manually.
+
 #### Export an API key
 
 You'll need a PagerDuty API key associated with PagerDuty account that has "Global Admin" access (which can be [configured in govuk-user-reviewer](https://github.com/alphagov/govuk-user-reviewer/blob/89102b7778cdf391e4aa6f3e830615093101cc39/config/govuk_tech.yml#L258-L260)):
