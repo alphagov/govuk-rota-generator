@@ -60,7 +60,7 @@ class PagerdutyClient
   end
 
   def in_past?(datetime)
-    Time.zone.parse(datetime) <= Time.now
+    Time.zone.parse(datetime) <= Time.zone.now
   end
 
   def shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)
