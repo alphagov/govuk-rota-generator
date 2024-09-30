@@ -5,9 +5,6 @@ on:
     # synchronise PagerDuty every hour (8pm-6pm) during the working week
     - cron:  '0 8-18 * * 1-5'
   workflow_dispatch: {}
-  # TODO: remove the below - we only want to run the workflow on push while we're testing the logic
-  push:
-    branches: [sync-pagerduty-on-cron]
 
 jobs:
   sync-pagerduty:
