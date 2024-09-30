@@ -85,6 +85,14 @@ Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc12
 
 ### Synchronise the rota with PagerDuty
 
+govuk-rota-generator automatically synchronises the Google Sheet rota with PagerDuty [on a regular basis](.github/workflows/sync_pagerduty.yml).
+
+The three ENV vars described in [Run the synchroniser script](#run-the-synchroniser-script), as well as the `GOOGLE_SERVICE_ACCOUNT_KEY` key from the [setup](#setup) phase, are stored as secrets on this repository. A failure notification is sent to Slack if the sync fails - the destination is determined by the `SLACK_WEBHOOK_URL` secret (reused from govuk-saas-config).
+
+Every quarter, a developer will need to swap out the `ROTA_TAB_NAME` to reflect the name of the next rota that needs synchronising.
+
+Below are the instructions for running the synchroniser manually.
+
 #### Export an API key
 
 You'll need a PagerDuty API key associated with PagerDuty account that has "Global Admin" access (which can be [configured in govuk-user-reviewer](https://github.com/alphagov/govuk-user-reviewer/blob/89102b7778cdf391e4aa6f3e830615093101cc39/config/govuk_tech.yml#L258-L260)):
@@ -94,23 +102,22 @@ You'll need a PagerDuty API key associated with PagerDuty account that has "Glob
 1. Click on "User Settings"
 1. Click "Create API User Token"
 
-Export this token as an ENV variable:
-
-```sh
-export PAGER_DUTY_API_KEY=$(more ~/pagerduty_token.txt)
-```
+Store this token somewhere safe, e.g. `~/pagerduty_token.txt`.
 
 #### Run the synchroniser script
 
 You can now synchronise a rota with PagerDuty using:
 
 ```sh
-ruby bin/sync_pagerduty.rb
+$ export ROTA_SHEET_URL="https://docs.google.com/spreadsheets/d/<sheet id>/edit"
+$ export ROTA_TAB_NAME="Q3 24/25 Rota"                                                                            
+$ export PAGER_DUTY_API_KEY=$(more ~/pagerduty_token.txt)
+$ bundle exec rake sync_pagerduty[false]
 ```
 
 This will:
 
-1. Use the rota in `data/tmp_rota.yml` (created automatically by the "calculate fairness" script)
+1. Fetch the rota corresponding to `ROTA_SHEET_URL` and `ROTA_TAB_NAME`
 1. Map the roles in that rota to the roles in `config/roles.yml`, where it finds the corresponding PagerDuty schedule IDs
 1. Fetch the list of PagerDuty users and match these up with the users in your rota, warning on any names that are missing from PagerDuty (and skipping over those shifts)±
 1. Find conflicts between the PagerDuty schedule and the local rota, and apply overrides to fix them
@@ -119,8 +126,8 @@ This will:
 
 By default, the script will ask you to approve each override: `y` to override, `n` to skip, and `exit` to close the script altogether. This means you can do a 'dry run' of the synchroniser by choosing `n` each time.
 
-If you wish to approve all of the overrides at once, you can pass the `--bulk` option:
+If you wish to approve all of the overrides at once, you can pass `true` to the rake task:
 
 ```sh
-ruby bin/sync_pagerduty.rb --bulk
+bundle exec rake sync_pagerduty[true]
 ```

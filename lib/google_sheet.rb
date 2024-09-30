@@ -5,7 +5,21 @@ require "json"
 
 class GoogleSheetException < StandardError; end
 
+# Only used because the Google SDK expects `json_key_io`
+# to have a `read` method callable on it
+class PretendFile
+  def initialize(key)
+    @key = key
+  end
+
+  def read
+    @key
+  end
+end
+
 class GoogleSheet
+  GOOGLE_SERVICE_ACCOUNT_KEY = ENV["GOOGLE_SERVICE_ACCOUNT_KEY"]
+
   def initialize(sheets_api: Google::Apis::SheetsV4::SheetsService.new, scope: :read)
     # https://developers.google.com/identity/protocols/oauth2/scopes#script
     scope = if scope == :read
@@ -14,8 +28,16 @@ class GoogleSheet
               Google::Apis::SheetsV4::AUTH_SPREADSHEETS
             end
 
+    json_key_io = if GoogleSheet::GOOGLE_SERVICE_ACCOUNT_KEY
+                    PretendFile.new(GoogleSheet::GOOGLE_SERVICE_ACCOUNT_KEY)
+                  elsif File.file?("./google_service_account_key.json")
+                    File.open("./google_service_account_key.json")
+                  else
+                    raise GoogleSheetException, "No GOOGLE_SERVICE_ACCOUNT_KEY provided"
+                  end
+
     authorizer = Google::Auth::ServiceAccountCredentials.make_creds(
-      json_key_io: File.open("./google_service_account_key.json"),
+      json_key_io:,
       scope:,
     )
     authorizer.fetch_access_token!

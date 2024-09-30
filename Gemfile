@@ -4,6 +4,7 @@ gem "activesupport"
 gem "google-apis-sheets_v4"
 gem "googleauth"
 gem "httparty"
+gem "rake"
 
 group :test do
   gem "byebug"
