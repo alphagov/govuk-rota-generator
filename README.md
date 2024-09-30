@@ -87,7 +87,7 @@ Run `ruby bin/calculate_fairness.rb https://docs.google.com/spreadsheets/d/abc12
 
 govuk-rota-generator automatically synchronises the Google Sheet rota with PagerDuty [on a regular basis](.github/workflows/sync_pagerduty.yml).
 
-The three ENV vars described in [Run the synchroniser script](#run-the-synchroniser-script), as well as the `GOOGLE_SERVICE_ACCOUNT_KEY` key from the [setup](#setup) phase, are stored as secrets on this repository.
+The three ENV vars described in [Run the synchroniser script](#run-the-synchroniser-script), as well as the `GOOGLE_SERVICE_ACCOUNT_KEY` key from the [setup](#setup) phase, are stored as secrets on this repository. A failure notification is sent to Slack if the sync fails - the destination is determined by the `SLACK_WEBHOOK_URL` secret (reused from govuk-saas-config).
 
 Every quarter, a developer will need to swap out the `ROTA_TAB_NAME` to reflect the name of the next rota that needs synchronising.
 

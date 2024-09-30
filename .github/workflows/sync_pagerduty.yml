@@ -28,3 +28,33 @@ jobs:
           PAGER_DUTY_API_KEY: ${{ secrets.PAGER_DUTY_API_KEY }}
           ROTA_SHEET_URL: ${{ secrets.ROTA_SHEET_URL }}
           ROTA_TAB_NAME: ${{ secrets.ROTA_TAB_NAME }}
+
+      - name: Notify failure
+        uses: slackapi/slack-github-action@v1
+        if: ${{ failure() }}
+        with:
+          payload: |
+            {
+              "text": "The <https://github.com/alphagov/govuk-rota-generator/blob/main/.github/workflows/sync_pagerduty.yml|PagerDuty sync script> failed.",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "The <https://github.com/alphagov/govuk-rota-generator/blob/main/.github/workflows/sync_pagerduty.yml|PagerDuty sync script> failed."
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Check the build logs for details"
+                    },
+                    "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                    "action_id": "button-view-workflow"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
