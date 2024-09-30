@@ -238,6 +238,18 @@ RSpec.describe PagerdutyClient do
     end
   end
 
+  describe "#in_past?" do
+    let(:pd) { described_class.new(api_token: "foo") }
+
+    it "returns true if the datetime is in the past" do
+      expect(pd.in_past?("2019-01-01T09:30:00+01:00")).to be(true)
+    end
+
+    it "returns false if the datetime is in the future" do
+      expect(pd.in_past?("3000-01-01T09:30:00+01:00")).to be(false)
+    end
+  end
+
   describe "#shifts_within_timespan" do
     it "returns the range of PagerDuty shifts covered by the start/end datetime" do
       first_pd_shift = {

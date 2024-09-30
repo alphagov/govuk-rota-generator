@@ -59,6 +59,10 @@ class PagerdutyClient
     end
   end
 
+  def in_past?(datetime)
+    Time.zone.parse(datetime) <= Time.now
+  end
+
   def shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)
     existing_pagerduty_shifts.select do |shift|
       Time.zone.parse(shift["start"]) >= Time.zone.parse(start_datetime) &&
