@@ -71,6 +71,8 @@ class SyncPagerduty
 
       puts "Overriding #{shifts_to_overwrite.count} individual shifts in PagerDuty..."
       shifts_to_overwrite.each do |shift_to_assign|
+        next if pd.in_past?(shift_to_assign[:end_datetime])
+
         pagerduty_shifts_to_override = pd.shifts_within_timespan(
           shift_to_assign[:start_datetime],
           shift_to_assign[:end_datetime],
