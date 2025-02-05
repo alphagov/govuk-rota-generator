@@ -48,7 +48,12 @@ class SyncPagerduty
         person.name = overridden_name[:pagerduty]
       end
 
-      if (pagerduty_user = users.find { |user| user["name"] == person.name })
+      last_shift = person.assigned_shifts.map { |shift| Time.zone.parse(shift[:date]) }.max
+
+      if last_shift < Time.zone.now
+        puts "Skipping processing overrides for #{person.name} as their last shift was on #{last_shift}."
+        nil
+      elsif (pagerduty_user = users.find { |user| user["name"] == person.name })
         person.pagerduty_user_id = pagerduty_user["id"]
         person
       else
