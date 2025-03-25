@@ -18,7 +18,10 @@ module Algorithms
           candidates = @people.select { |candidate| candidate.can_do_role?(role) }
           candidates = sort_people_by_value_of_shifts(candidates)
           candidates = push_teammates_to_back_of_queue(candidates, role, dates_for_week)
-          person_to_assign = find_most_suitable_candidate(candidates, role, dates_for_role)
+
+          last_resort_candidates = candidates_who_had_a_shift_last_or_next_week(candidates, dates_for_week)
+          candidates_who_have_had_a_break = candidates - last_resort_candidates
+          person_to_assign = find_most_suitable_candidate(candidates_who_have_had_a_break, role, dates_for_role)
 
           dates_for_role.each do |date|
             person_to_assign.assign(date:, role:)
@@ -49,6 +52,18 @@ module Algorithms
     def self.sort_people_by_value_of_shifts(people)
       # ensure people are ordered in terms of shift burden
       people.sort_by { |person| @roles_config.value_of_shifts(person.assigned_shifts) }
+    end
+
+    def self.candidates_who_had_a_shift_last_or_next_week(candidates, dates_for_week)
+      last_week_dates = dates_for_week.map { |date| DataProcessor.format_date(Date.parse(date) - 7) }
+      next_week_dates = dates_for_week.map { |date| DataProcessor.format_date(Date.parse(date) + 7) }
+      dates = last_week_dates + next_week_dates
+      candidates.select do |candidate|
+        candidate
+          .assigned_shifts
+          .select { |shift| dates.include?(shift[:date]) }
+          .any?
+      end
     end
 
     def self.push_teammates_to_back_of_queue(people, role, dates_for_week)
@@ -95,12 +110,16 @@ module Algorithms
     end
 
     def self.assign_stray_shifts(stray_shifts)
+      sorted_candidates = sort_people_by_value_of_shifts(@people)
+      last_resort_candidates = candidates_who_had_a_shift_last_or_next_week(sorted_candidates, stray_shifts.map { |shift| shift[:date] })
+
       stray_shifts.each do |shift|
         date = shift[:date]
         role = shift[:role]
 
-        @people = sort_people_by_value_of_shifts(@people)
-        person = @people.find { |candidate| candidate.availability(date:).include?(role) }
+        candidates_who_have_had_a_break = sorted_candidates - last_resort_candidates
+        person = candidates_who_have_had_a_break.find { |candidate| candidate.availability(date:).include?(role) } ||
+          last_resort_candidates.find { |candidate| candidate.availability(date:).include?(role) }
         if person.nil?
           puts "NOBODY ABLE TO FILL #{role} on #{date}"
         else
