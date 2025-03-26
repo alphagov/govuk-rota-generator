@@ -197,6 +197,87 @@ RSpec.describe Algorithms::Weekly do
       ])
       expect(person_c.assigned_shifts).to eq([])
     end
+
+    it "avoids assigning someone to any kind of shift two weeks in a row" do
+      # somewhat contrived example - we're going to pretend someone has already
+      # been assigned a bunch of shifts, and we're now trying to assign the
+      # final week.
+      # This does expose the fact that we favour avoiding back-to-back shifts
+      # over evenly distributing shifts, but in a real world scenario we're
+      # allocating shifts quite evenly as we go along.
+      person_a = Person.new(
+        email: "a@a.com",
+        team: "Foo",
+        can_do_roles: %i[inhours_primary],
+        assigned_shifts: [
+          { date: "01/04/2024", role: :inhours_primary },
+          { date: "02/04/2024", role: :inhours_primary },
+          { date: "03/04/2024", role: :inhours_primary },
+          { date: "04/04/2024", role: :inhours_primary },
+          { date: "05/04/2024", role: :inhours_primary },
+          { date: "08/04/2024", role: :inhours_primary },
+          { date: "09/04/2024", role: :inhours_primary },
+          { date: "10/04/2024", role: :inhours_primary },
+          { date: "11/04/2024", role: :inhours_primary },
+          { date: "12/04/2024", role: :inhours_primary },
+        ],
+      )
+      person_b = Person.new(
+        email: "b@b.com",
+        team: "Foo",
+        can_do_roles: %i[inhours_primary],
+        assigned_shifts: [
+          { date: "15/04/2024", role: :inhours_primary },
+          { date: "16/04/2024", role: :inhours_primary },
+          { date: "17/04/2024", role: :inhours_primary },
+          { date: "18/04/2024", role: :inhours_primary },
+          { date: "19/04/2024", role: :inhours_primary },
+        ],
+      )
+      roles_config = {
+        inhours_primary: {
+          value: 1,
+          weekdays: true,
+          weeknights: false,
+          weekends: false,
+        },
+      }
+      dates = [
+        "22/04/2024", # Mon
+        "23/04/2024",
+        "24/04/2024",
+        "25/04/2024",
+        "26/04/2024",
+        "27/04/2024", # Sat
+        "28/04/2024", # Sun
+      ]
+      described_class.fill_slots!(people: [person_a, person_b], dates:, roles_config:)
+
+      expect(person_a.assigned_shifts).to eq([
+        { date: "01/04/2024", role: :inhours_primary },
+        { date: "02/04/2024", role: :inhours_primary },
+        { date: "03/04/2024", role: :inhours_primary },
+        { date: "04/04/2024", role: :inhours_primary },
+        { date: "05/04/2024", role: :inhours_primary },
+        { date: "08/04/2024", role: :inhours_primary },
+        { date: "09/04/2024", role: :inhours_primary },
+        { date: "10/04/2024", role: :inhours_primary },
+        { date: "11/04/2024", role: :inhours_primary },
+        { date: "12/04/2024", role: :inhours_primary },
+        { date: "22/04/2024", role: :inhours_primary },
+        { date: "23/04/2024", role: :inhours_primary },
+        { date: "24/04/2024", role: :inhours_primary },
+        { date: "25/04/2024", role: :inhours_primary },
+        { date: "26/04/2024", role: :inhours_primary },
+      ])
+      expect(person_b.assigned_shifts).to eq([
+        { date: "15/04/2024", role: :inhours_primary },
+        { date: "16/04/2024", role: :inhours_primary },
+        { date: "17/04/2024", role: :inhours_primary },
+        { date: "18/04/2024", role: :inhours_primary },
+        { date: "19/04/2024", role: :inhours_primary },
+      ])
+    end
   end
 
   describe ".bank_holiday_dates" do
