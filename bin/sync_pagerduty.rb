@@ -74,72 +74,44 @@ class SyncPagerduty
       assigned_shifts_this_schedule = pd.assigned_shifts_this_schedule(schedule_id, rota[:dates].first, rota[:dates].last)
       shifts_to_overwrite = pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)
 
-      puts "Overriding #{shifts_to_overwrite.count} individual shifts in PagerDuty..."
+      puts "Overriding #{shifts_to_overwrite.count} shifts in PagerDuty..."
       shifts_to_overwrite.each do |shift_to_assign|
         next if pd.in_past?(shift_to_assign[:end_datetime])
 
-        pagerduty_shifts_to_override = pd.shifts_within_timespan(
-          shift_to_assign[:start_datetime],
-          shift_to_assign[:end_datetime],
-          assigned_shifts_this_schedule,
-        )
+        existing_shifts = pd.find_corresponding_shifts(assigned_shifts_this_schedule, shift_to_assign)
+        existing_users = existing_shifts.map { |shift| shift["user"]["summary"] }
 
-        if pagerduty_shifts_to_override.empty?
-          # TODO: this message can happen when someone has two distinct back-to-back
-          # shifts, e.g. someone covering bank holiday may have inhours_primary 9:30-17:30
-          # followed by oncall_primary 17:30-9:30. PagerDuty API returns this as one
-          # 9:30-9:30 shift, which doesn't match our internal representation of two shifts,
-          # so we're getting this message. Would be great to fix this in future.
-          puts "Warning: failed to assign #{shift_to_assign[:person].name} to the #{role_id} role from #{shift_to_assign[:start_datetime]} to #{shift_to_assign[:end_datetime]}. You'll need to apply this manually in the PagerDuty UI."
-          errors_found = true
-          next
-        elsif pagerduty_shifts_to_override.count.positive?
-          puts "Overriding #{pagerduty_shifts_to_override.count} PagerDuty shifts for this shift."
+        puts "Set #{shift_to_assign[:person].name} as the #{role_id} from #{shift_to_assign[:start_datetime]}-#{shift_to_assign[:end_datetime]} (replacing #{existing_users.join(' and ')})? y/n/exit"
+
+        valid_action = false
+        action = false
+        if bulk_apply_overrides
+          action = "y"
+        else
+          until valid_action
+            action = $stdin.gets.chomp
+            valid_action = %w[y n exit].include?(action)
+            puts "Option #{action.inspect} not recognised" unless valid_action
+          end
         end
 
-        pagerduty_shifts_to_override.each do |existing|
-          # Sometimes, for whatever reason, part of a long shift has already been assigned to the right user.
-          # e.g. a 17:30 Friday -> 09:30 Monday, where perhaps the correct person is assigned apart from for
-          # the 09:30 Sunday -> 09:30 Monday slot. In this case, the start/end times for the person's shift
-          # don't match and so all of the composite parts of the shift are included in
-          # `pagerduty_shifts_to_override`. We can safely skip over the correctly assigned shifts and just
-          # let the one 'bad' shift get prompted and overwritten. On subsequent runs of the script, the
-          # entire shift would no longer be included in `pagerduty_shifts_to_override`, as the start/end
-          # timestamps would now match.
-          next if shift_to_assign[:person].name == existing["user"]["summary"]
+        case action
+        when "y"
+          puts "Overwriting... #{shift_to_assign[:person].pagerduty_user_id} to #{shift_to_assign[:start_datetime]} to #{shift_to_assign[:end_datetime]}"
+          response = pd.create_override(schedule_id, shift_to_assign[:person].pagerduty_user_id, shift_to_assign[:start_datetime], shift_to_assign[:end_datetime])
 
-          puts "Set #{shift_to_assign[:person].name} as the #{role_id} from #{shift_to_assign[:start_datetime]}-#{shift_to_assign[:end_datetime]} (replacing #{existing['user']['summary']})? y/n/exit"
-
-          valid_action = false
-          action = false
-          if bulk_apply_overrides
-            action = "y"
+          if response.code == 400
+            puts "...error applying override."
+            puts response.body
+            errors_found = true
           else
-            until valid_action
-              action = $stdin.gets.chomp
-              valid_action = %w[y n exit].include?(action)
-              puts "Option #{action.inspect} not recognised" unless valid_action
-            end
+            puts "...overwrite applied!"
           end
-
-          case action
-          when "y"
-            puts "Overwriting... #{shift_to_assign[:person].pagerduty_user_id} to #{existing['start']} to #{existing['end']}"
-            response = pd.create_override(schedule_id, shift_to_assign[:person].pagerduty_user_id, existing["start"], existing["end"])
-
-            if response.code == 400
-              puts "...error applying override."
-              puts response.body
-              errors_found = true
-            else
-              puts "...overwrite applied!"
-            end
-          when "n"
-            puts "Skipping."
-            next
-          when "exit"
-            exit
-          end
+        when "n"
+          puts "Skipping."
+          next
+        when "exit"
+          exit
         end
       end
       puts "Finished overriding #{role_id} shifts."

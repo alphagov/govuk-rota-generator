@@ -1,4 +1,5 @@
 require "pagerduty_client"
+require_relative "../lib/person"
 
 RSpec.describe PagerdutyClient do
   let(:user) do
@@ -236,6 +237,70 @@ RSpec.describe PagerdutyClient do
         incorrectly_assigned,
       ])
     end
+
+    it "doesn't complain if the shift is represented slightly differently for the same person" do
+      john = Person.new(email: "John@example.com", team: "Foo", can_do_roles: %i[oncall_primary])
+      in_hours_shift = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2025-05-05T09:30:00+01:00",
+        end_datetime: "2025-05-05T17:30:00+01:00",
+      }
+      out_of_hours_shift = {
+        person: john,
+        role: :oncall_primary,
+        start_datetime: "2025-05-05T17:30:00+01:00",
+        end_datetime: "2025-05-06T09:30:00+01:00",
+      }
+      shifts_to_assign = [
+        in_hours_shift,
+        out_of_hours_shift,
+      ]
+
+      # John has already been assigned the full shift (in-hours rolling into out-of-hours)
+      assigned_shifts_this_schedule = [
+        {
+          "start" => "2025-05-05T09:30:00+01:00",
+          "end" => "2025-05-06T09:30:00+01:00",
+          "user" => {
+            "id" => "PRTM7I8",
+            "summary" => "John",
+          },
+        },
+      ]
+
+      # `shifts_assigned_to_wrong_person` should return empty array, i.e. everything is OK
+      pd = described_class.new(api_token: "foo")
+      expect(pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)).to eq([])
+    end
+
+    it "doesn't complain if the assigned shifts span a greater timespan than is being queried" do
+      john = Person.new(email: "John@example.com", team: "Foo", can_do_roles: %i[oncall_primary])
+      shifts_to_assign = [
+        {
+          person: john,
+          role: :oncall_primary,
+          start_datetime: "2025-05-05T10:00:00+01:00",
+          end_datetime: "2025-05-05T11:00:00+01:00",
+        },
+      ]
+
+      # John has already been assigned this shift and also time 'surrounding' it
+      assigned_shifts_this_schedule = [
+        {
+          "start" => "2025-05-04T09:30:00+01:00",
+          "end" => "2025-05-06T09:30:00+01:00",
+          "user" => {
+            "id" => "PRTM7I8",
+            "summary" => "John",
+          },
+        },
+      ]
+
+      # `shifts_assigned_to_wrong_person` should return empty array, i.e. everything is OK
+      pd = described_class.new(api_token: "foo")
+      expect(pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)).to eq([])
+    end
   end
 
   describe "#in_past?" do
@@ -250,8 +315,13 @@ RSpec.describe PagerdutyClient do
     end
   end
 
-  describe "#shifts_within_timespan" do
-    it "returns the range of PagerDuty shifts covered by the start/end datetime" do
+  describe "#find_corresponding_shifts" do
+    it "returns the PagerDuty shifts covered by the start/end datetime" do
+      shift_to_assign = {
+        start_datetime: "2024-04-01T17:30:00+01:00",
+        end_datetime: "2024-04-02T17:30:00+01:00",
+      }
+
       first_pd_shift = {
         "start" => "2024-04-01T17:30:00+01:00",
         "end" => "2024-04-02T09:30:00+01:00",
@@ -270,14 +340,104 @@ RSpec.describe PagerdutyClient do
         third_pd_shift,
       ]
 
-      start_datetime = "2024-04-01T17:30:00+01:00"
-      end_datetime = "2024-04-02T17:30:00+01:00"
-
       pd = described_class.new(api_token: "foo")
-      expect(pd.shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)).to eq([
+      expect(pd.find_corresponding_shifts(existing_pagerduty_shifts, shift_to_assign)).to eq([
         first_pd_shift,
         second_pd_shift,
       ])
+    end
+
+    it "catches exact shift matches" do
+      pd_shift = {
+        "start" => "2024-04-01T17:30:00+01:00",
+        "end" => "2024-04-02T09:30:00+01:00",
+      }
+
+      shift_to_assign = {
+        start_datetime: "2024-04-01T17:30:00+01:00",
+        end_datetime: "2024-04-02T09:30:00+01:00",
+      }
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.find_corresponding_shifts([pd_shift], shift_to_assign)).to eq([
+        pd_shift,
+      ])
+    end
+
+    it "catches shifts that start and end during the window" do
+      shift_to_assign = {
+        start_datetime: "2024-04-01T09:00:00+01:00",
+        end_datetime: "2024-04-01T11:00:00+01:00",
+      }
+      pd_shift_that_encapsulates_the_window = {
+        "start" => "2024-04-01T08:00:00+01:00",
+        "end" => "2024-04-01T12:00:00+01:00",
+      }
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.find_corresponding_shifts([pd_shift_that_encapsulates_the_window], shift_to_assign)).to eq([
+        pd_shift_that_encapsulates_the_window,
+      ])
+    end
+
+    it "catches shifts that start during the window but finish afterwards" do
+      shift_to_assign = {
+        start_datetime: "2024-04-01T09:00:00+01:00",
+        end_datetime: "2024-04-01T11:00:00+01:00",
+      }
+      overlapping_pd_shift = {
+        "start" => "2024-04-01T10:00:00+01:00",
+        "end" => "2024-04-01T12:00:00+01:00",
+      }
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.find_corresponding_shifts([overlapping_pd_shift], shift_to_assign)).to eq([
+        overlapping_pd_shift,
+      ])
+    end
+
+    it "catches shifts that end during the window but start before" do
+      shift_to_assign = {
+        start_datetime: "2024-04-01T09:00:00+01:00",
+        end_datetime: "2024-04-01T11:00:00+01:00",
+      }
+      overlapping_pd_shift = {
+        "start" => "2024-04-01T08:00:00+01:00",
+        "end" => "2024-04-01T10:00:00+01:00",
+      }
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.find_corresponding_shifts([overlapping_pd_shift], shift_to_assign)).to eq([
+        overlapping_pd_shift,
+      ])
+    end
+
+    it "rejects shifts that end at the start time" do
+      shift_to_assign = {
+        start_datetime: "2024-04-01T09:00:00+01:00",
+        end_datetime: "2024-04-01T11:00:00+01:00",
+      }
+      adjacent_pd_shift = {
+        "start" => "2024-04-01T08:00:00+01:00",
+        "end" => "2024-04-01T09:00:00+01:00",
+      }
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.find_corresponding_shifts([adjacent_pd_shift], shift_to_assign)).to eq([])
+    end
+
+    it "rejects shifts that start at the end time" do
+      shift_to_assign = {
+        start_datetime: "2024-04-01T09:00:00+01:00",
+        end_datetime: "2024-04-01T11:00:00+01:00",
+      }
+      adjacent_pd_shift = {
+        "start" => "2024-04-01T11:00:00+01:00",
+        "end" => "2024-04-01T12:00:00+01:00",
+      }
+
+      pd = described_class.new(api_token: "foo")
+      expect(pd.find_corresponding_shifts([adjacent_pd_shift], shift_to_assign)).to eq([])
     end
   end
 

@@ -51,11 +51,10 @@ class PagerdutyClient
 
   def shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)
     shifts_to_assign.flatten.reject do |shift_to_assign|
-      currently_assigned = assigned_shifts_this_schedule.find do |existing_shift|
-        existing_shift["start"] == shift_to_assign[:start_datetime] &&
-          existing_shift["end"] == shift_to_assign[:end_datetime]
-      end
-      currently_assigned && currently_assigned["user"]["summary"] == shift_to_assign[:person].name # person already assigned to this slot
+      corresponding_shifts = find_corresponding_shifts(assigned_shifts_this_schedule, shift_to_assign)
+      # person already assigned to this slot
+      corresponding_shifts.count.positive? &&
+        corresponding_shifts.all? { |shift| shift["user"]["summary"] == shift_to_assign[:person].name }
     end
   end
 
@@ -63,10 +62,18 @@ class PagerdutyClient
     Time.zone.parse(datetime) <= Time.zone.now
   end
 
-  def shifts_within_timespan(start_datetime, end_datetime, existing_pagerduty_shifts)
+  def find_corresponding_shifts(existing_pagerduty_shifts, shift_to_assign)
+    shift_to_assign_start_time = Time.zone.parse(shift_to_assign[:start_datetime])
+    shift_to_assign_end_time = Time.zone.parse(shift_to_assign[:end_datetime])
+
     existing_pagerduty_shifts.select do |shift|
-      Time.zone.parse(shift["start"]) >= Time.zone.parse(start_datetime) &&
-        Time.zone.parse(shift["end"]) <= Time.zone.parse(end_datetime)
+      shift_start_time = Time.zone.parse(shift["start"])
+      shift_end_time = Time.zone.parse(shift["end"])
+
+      starts_during_this_window = shift_start_time >= shift_to_assign_start_time && shift_start_time < shift_to_assign_end_time
+      ends_during_this_window = shift_end_time > shift_to_assign_start_time && shift_end_time <= shift_to_assign_end_time
+      starts_and_ends_during_this_window = shift_to_assign_start_time >= shift_start_time && shift_to_assign_end_time <= shift_end_time
+      starts_during_this_window || ends_during_this_window || starts_and_ends_during_this_window
     end
   end
 
