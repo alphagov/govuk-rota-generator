@@ -73,11 +73,12 @@ class SyncPagerduty
       end
       assigned_shifts_this_schedule = pd.assigned_shifts_this_schedule(schedule_id, rota[:dates].first, rota[:dates].last)
       shifts_to_overwrite = pd.shifts_assigned_to_wrong_person(shifts_to_assign, assigned_shifts_this_schedule)
+      shifts_to_overwrite = shifts_to_overwrite.reject do |shift|
+        pd.in_past?(shift[:end_datetime])
+      end
 
       puts "Overriding #{shifts_to_overwrite.count} shifts in PagerDuty..."
       shifts_to_overwrite.each do |shift_to_assign|
-        next if pd.in_past?(shift_to_assign[:end_datetime])
-
         existing_shifts = pd.find_corresponding_shifts(assigned_shifts_this_schedule, shift_to_assign)
         existing_users = existing_shifts.map { |shift| shift["user"]["summary"] }
 
