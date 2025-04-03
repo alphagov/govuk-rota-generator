@@ -116,7 +116,7 @@ class SyncPagerduty
             action = "y"
           else
             until valid_action
-              action = gets.chomp
+              action = $stdin.gets.chomp
               valid_action = %w[y n exit].include?(action)
               puts "Option #{action.inspect} not recognised" unless valid_action
             end
