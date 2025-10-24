@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem "activesupport"
 gem "google-apis-sheets_v4"
-gem "googleauth", "1.15.0"
+gem "googleauth", "1.15.1"
 gem "httparty"
 gem "rake"
 
