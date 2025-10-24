@@ -181,7 +181,7 @@ DEPENDENCIES
   activesupport
   byebug
   google-apis-sheets_v4
-  googleauth
+  googleauth (= 1.15.0)
   httparty
   rake
   rspec
