@@ -50,7 +50,7 @@ GEM
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
     google-logging-utils (0.2.0)
-    googleauth (1.15.1)
+    googleauth (1.15.0)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.2)
       google-logging-utils (~> 0.1)
@@ -181,7 +181,7 @@ DEPENDENCIES
   activesupport
   byebug
   google-apis-sheets_v4
-  googleauth (= 1.15.1)
+  googleauth (= 1.15.0)
   httparty
   rake
   rspec
