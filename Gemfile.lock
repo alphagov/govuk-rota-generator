@@ -61,7 +61,7 @@ GEM
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
     hashdiff (1.2.1)
-    httparty (0.24.0)
+    httparty (0.24.2)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -77,7 +77,7 @@ GEM
     minitest (6.0.1)
       prism (~> 1.5)
     multi_json (1.17.0)
-    multi_xml (0.8.0)
+    multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
     net-http (0.8.0)
       uri (>= 0.11.1)
