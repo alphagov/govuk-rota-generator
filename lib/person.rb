@@ -10,7 +10,7 @@ class Person
   attr_accessor :name, :pagerduty_user_id
   attr_reader :email, :team, :can_do_roles, :non_working_days, :assigned_shifts
 
-  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [], assigned_shifts: [])
+  def initialize(email:, team:, can_do_roles:, forbidden_in_hours_days: [], forbidden_on_call_days: [], non_working_days: [], assigned_shifts: [], roles_config: Roles.new)
     @email = email
     @name = email.match(/(.+)@(.+)$/)[1].split(".").map(&:capitalize).join(" ")
     @team = team
