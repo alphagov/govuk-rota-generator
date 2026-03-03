@@ -23,8 +23,8 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_KEY : ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
           PAGER_DUTY_API_KEY: ${{ secrets.PAGER_DUTY_API_KEY }}
-          ROTA_SHEET_URL: ${{ secrets.ROTA_SHEET_URL }}
-          ROTA_TAB_NAME: ${{ secrets.ROTA_TAB_NAME }}
+          ROTA_SHEET_URL: ${{ vars.ROTA_SHEET_URL }}
+          ROTA_TAB_NAME: ${{ vars.ROTA_TAB_NAME }}
 
       - name: Notify failure
         uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
