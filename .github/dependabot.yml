@@ -1,9 +1,14 @@
+---
 version: 2
 updates:
-  - package-ecosystem: bundler
-    directory: /
-    schedule:
-      interval: daily
-    ignore:
-    - dependency-name: "googleauth"
-      versions: [ ">=1.15.1" ]
+- package-ecosystem: bundler
+  directory: /
+  schedule:
+    interval: daily
+  ignore:
+  - dependency-name: googleauth
+    versions:
+    - '>=1.15.1'
+  cooldown:
+    default-days: 10
+...
