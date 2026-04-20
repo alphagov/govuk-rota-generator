@@ -160,5 +160,64 @@ module Algorithms
     def self.oncall_role?(role_id)
       !inhours_role?(role_id)
     end
+
+    def self.balance_slots(people, roles)
+      # only use people in our calculations if they have a chance of taking on a shift.
+      # Anyone else just skews things.
+      eligible_people = people.reject { |person| person.can_do_roles == [] }
+
+      puts "Attempting to balance rota."
+      least_to_most_burdened = eligible_people.sort_by { |person| roles.value_of_shifts(person.assigned_shifts) }
+      burden_figures = least_to_most_burdened.map { |person| roles.value_of_shifts(person.assigned_shifts) }
+      mean = burden_figures.sum(0.0) / burden_figures.size
+      sum = burden_figures.sum(0.0) { |element| (element - mean)**2 }
+      variance = sum / (burden_figures.size - 1)
+      current_standard_deviation = Math.sqrt(variance)
+      puts "    Mean = #{mean}, current standard_deviation = #{current_standard_deviation}"
+
+      least_to_most_burdened.each do |person_a|
+        # if index > (least_to_most_burdened.count / 2)
+        #   # At roughly the halfway point, stop trying to reassign shifts.
+        #   # It only ends up skewing the disparities even further, as the
+        #   # most burdened engineers start reassigning their on-call shifts
+        #   # and the in-hours shifts 'trickle down' to the lesser burdened
+        #   # engineers on subsequent re-runs of `balance_slots`
+        #   break
+        # end
+
+        most_to_least_burdened = least_to_most_burdened.reverse
+        while (person_b = most_to_least_burdened.shift)
+          next unless roles.value_of_shifts(person_a.assigned_shifts) < roles.value_of_shifts(person_b.assigned_shifts)
+
+          change_made = false
+          person_b.assigned_shifts.each do |shift|
+            next unless person_a.availability(date: shift[:date]).include?(shift[:role])
+
+            # puts "#{person_a.name} is taking over from #{person_b.name} for #{shift[:role]} on #{shift[:date]}"
+            # puts "    Old burden distribution: #{roles.value_of_shifts(person_a.assigned_shifts)}, #{roles.value_of_shifts(person_b.assigned_shifts)}"
+            person_a.assign(date: shift[:date], role: shift[:role])
+            person_b.unassign(date: shift[:date], role: shift[:role])
+            # puts "    New burden distribution: #{roles.value_of_shifts(person_a.assigned_shifts)}, #{roles.value_of_shifts(person_b.assigned_shifts)}"
+            change_made = true
+            break
+          end
+
+          unless change_made
+            # puts "Unable to find any shift swap opportunities for #{person_a.name} (#{roles.value_of_shifts(person_a.assigned_shifts)}) and #{person_b.name} (#{roles.value_of_shifts(person_b.assigned_shifts)})"
+          end
+        end
+      end
+
+      puts "Did we improve things?"
+      least_to_most_burdened = eligible_people.sort_by { |person| roles.value_of_shifts(person.assigned_shifts) }
+      burden_figures = least_to_most_burdened.map { |person| roles.value_of_shifts(person.assigned_shifts) }
+      mean = burden_figures.sum(0.0) / burden_figures.size
+      sum = burden_figures.sum(0.0) { |element| (element - mean)**2 }
+      variance = sum / (burden_figures.size - 1)
+      standard_deviation = Math.sqrt(variance)
+      puts "    New standard_deviation = #{standard_deviation} (before: #{current_standard_deviation})"
+
+      standard_deviation
+    end
   end
 end
